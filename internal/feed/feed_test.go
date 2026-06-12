@@ -230,17 +230,18 @@ func TestNoLocationPropertyWhenVenueAbsent(t *testing.T) {
 	}
 }
 
-// Subscribed clients should re-poll hourly, matching sync_interval.
-func TestFeedAdvertisesHourlyRefresh(t *testing.T) {
+// Subscribed clients should re-poll on an interval matching
+// sync_interval (10 minutes).
+func TestFeedAdvertisesRefreshInterval(t *testing.T) {
 	out, err := feed.Render(host, []fixtures.Match{scheduled()})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(out, "REFRESH-INTERVAL;VALUE=DURATION:PT1H") {
-		t.Error("feed missing REFRESH-INTERVAL:PT1H")
+	if !strings.Contains(out, "REFRESH-INTERVAL;VALUE=DURATION:PT10M") {
+		t.Error("feed missing REFRESH-INTERVAL:PT10M")
 	}
-	if !strings.Contains(out, "X-PUBLISHED-TTL:PT1H") {
-		t.Error("feed missing X-PUBLISHED-TTL:PT1H")
+	if !strings.Contains(out, "X-PUBLISHED-TTL:PT10M") {
+		t.Error("feed missing X-PUBLISHED-TTL:PT10M")
 	}
 }
 

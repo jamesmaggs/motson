@@ -6,6 +6,7 @@ package feed
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	ics "github.com/arran4/golang-ical"
 
@@ -19,7 +20,7 @@ func Render(host string, matches []fixtures.Match) (string, error) {
 	cal.SetProductId("-//Motson//World Cup 2026//EN")
 	cal.SetName("World Cup 2026")
 	// Subscribed clients re-poll on this hint, matching sync_interval.
-	refresh := fmt.Sprintf("PT%dH", int(fixtures.SyncInterval.Hours()))
+	refresh := iso8601Duration(fixtures.SyncInterval)
 	cal.SetRefreshInterval(refresh)
 	cal.SetXPublishedTTL(refresh)
 
@@ -35,6 +36,15 @@ func Render(host string, matches []fixtures.Match) (string, error) {
 		e.SetDescription(statusLabels[m.Status])
 	}
 	return cal.Serialize(), nil
+}
+
+// iso8601Duration formats a sync interval as an RFC 5545 duration:
+// whole hours as "PT{n}H", otherwise minutes as "PT{n}M".
+func iso8601Duration(d time.Duration) string {
+	if d%time.Hour == 0 {
+		return fmt.Sprintf("PT%dH", int(d/time.Hour))
+	}
+	return fmt.Sprintf("PT%dM", int(d/time.Minute))
 }
 
 func nameOrTBC(team string) string {

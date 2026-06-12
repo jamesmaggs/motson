@@ -2,8 +2,8 @@
 
 Live World Cup 2026 fixtures and scores, served as an Apple
 Calendar-compatible feed and a web page. Fixture data is mirrored
-hourly from [football-data.org](https://www.football-data.org) into
-Postgres and served even when the provider is down.
+every 10 minutes from [football-data.org](https://www.football-data.org)
+into Postgres and served even when the provider is down.
 
 - **Web page**: `/` — fixtures and scores, kickoffs in your local time
 - **Calendar feed**: `/calendar.ics` — subscribe in Apple Calendar;
@@ -54,7 +54,7 @@ go run ./cmd/motson
 | `FEED_HOST` | no | `motson.jamesmaggs.com` |
 
 The schema is provisioned idempotently at boot; a fresh database needs
-no setup. The first sync runs immediately, then hourly.
+no setup. The first sync runs immediately, then every 10 minutes.
 
 ## Deployment
 

@@ -10,7 +10,7 @@ import (
 
 // Config defaults from the spec's config block.
 const (
-	SyncInterval          = time.Hour
+	SyncInterval          = 10 * time.Minute
 	GroupMatchDuration    = 2 * time.Hour
 	KnockoutMatchDuration = 2*time.Hour + 45*time.Minute
 	StalenessThreshold    = 3 * time.Hour

@@ -10,7 +10,7 @@ import (
 // Obligations: config-default.sync_interval, config-default.group_match_duration,
 // config-default.knockout_match_duration, config-default.staleness_threshold
 func TestConfigDefaults(t *testing.T) {
-	if got, want := fixtures.SyncInterval, time.Hour; got != want {
+	if got, want := fixtures.SyncInterval, 10*time.Minute; got != want {
 		t.Errorf("SyncInterval = %v, want %v", got, want)
 	}
 	if got, want := fixtures.GroupMatchDuration, 2*time.Hour; got != want {

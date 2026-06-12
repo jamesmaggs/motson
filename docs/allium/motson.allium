@@ -20,11 +20,13 @@
 --   - The web page always shows when data was last synced
 
 config {
-    sync_interval: Duration = 1.hour
+    -- The provider's free tier allows 10 requests/hour; a 10-minute
+    -- interval (6/hour) stays within it.
+    sync_interval: Duration = 10.minutes
     group_match_duration: Duration = 2.hours
     knockout_match_duration: Duration = 2.hours + 45.minutes
-    -- Three consecutive missed syncs before the system reports
-    -- itself unhealthy.
+    -- How old the last successful sync may be before the system
+    -- reports itself unhealthy.
     staleness_threshold: Duration = 3.hours
 }
 
@@ -100,7 +102,7 @@ value GroupStanding {
     points: won * 3 + drawn
 }
 
--- Singleton pacing the hourly refresh.
+-- Singleton pacing the periodic refresh.
 entity SyncSchedule {
     next_run_at: Timestamp
     last_synced_at: Timestamp?
