@@ -5,13 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Motson — World Cup 2026 fixtures</title>
   <link rel="stylesheet" href="/static/pico.min.css">
+  <link rel="stylesheet" href="/static/fonts.css">
   <link rel="alternate" type="text/calendar" title="World Cup 2026 calendar" href="/calendar.ics">
   <style>
+    /* Floodlit scoreboard: dark night-match chrome, amber scores,
+       Bebas Neue title over Inter data. */
+    body { background: #11151a; color: #e8e6e3; font-family: Inter, -apple-system, system-ui, sans-serif; }
+    main h1, main p, main th, main td, footer p { color: #e8e6e3; }
+    h1 { color: #fff; font-family: "Bebas Neue", Inter, sans-serif; font-weight: 400; font-size: 3rem; letter-spacing: .06em; }
+    table { --pico-background-color: transparent; }
+    thead th { color: #8d97a3; border-bottom: 2px solid #2a313a; text-transform: uppercase; font-size: .8em; letter-spacing: .08em; }
+    tbody td { border-color: #232a32; }
+    tbody tr:hover { background: #171c22; }
+    a { color: #ffd23f; }
     .fixture td:first-child { white-space: nowrap; }
     td.home { text-align: right; }
-    td.score { text-align: center; font-weight: bold; white-space: nowrap; }
+    td.score { text-align: center; font-weight: 700; white-space: nowrap; color: #ffd23f; font-variant-numeric: tabular-nums; text-shadow: 0 0 12px rgba(255, 210, 63, .35); }
     td.away { text-align: left; }
-    .state { color: var(--pico-muted-color); font-weight: normal; }
+    .state { color: #79838e; font-weight: normal; }
   </style>
 </head>
 <body>

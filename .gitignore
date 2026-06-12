@@ -6,3 +6,7 @@
 
 # Claude
 .claude/settings.local.json
+
+# Local styling previews (never shipped)
+preview/
+tools/preview/
