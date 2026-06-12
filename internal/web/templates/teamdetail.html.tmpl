@@ -15,8 +15,7 @@
     <h3>{{if .GroupURL}}<a href="{{.GroupURL}}">{{.GroupName}}</a>{{else}}{{.GroupName}}{{end}}</h3>
 {{template "standingsTable" .Standings}}
     {{end}}
-    <table class="fixtures">
-      <colgroup><col class="c-kick"><col class="c-side"><col class="c-score"><col class="c-side"><col>{{if .HasVenues}}<col>{{end}}</colgroup>
+    <table>
       <thead>
         <tr><th>Kick-off</th><th colspan="3" class="match">Match</th><th>Stage</th>{{if .HasVenues}}<th>Venue</th>{{end}}</tr>
       </thead>
