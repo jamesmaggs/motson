@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Motson — World Cup 2026 fixtures</title>
+  <link rel="stylesheet" href="/static/pico.min.css">
+  <link rel="alternate" type="text/calendar" title="World Cup 2026 calendar" href="/calendar.ics">
+  <style>
+    .fixture td:first-child { white-space: nowrap; }
+    .score { font-weight: bold; white-space: nowrap; }
+    .state { color: var(--pico-muted-color); }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header>
+      <h1>World Cup 2026</h1>
+      <p>
+        Fixtures and scores, updated hourly.
+        <a href="/calendar.ics">Subscribe in your calendar</a>.
+      </p>
+    </header>
+    <table>
+      <thead>
+        <tr><th>Kick-off</th><th>Match</th><th>Stage</th><th>Venue</th></tr>
+      </thead>
+      <tbody>
+        {{range .Matches}}
+        <tr class="fixture">
+          <td><time datetime="{{.KickoffUTC}}">{{.KickoffUTC}}</time></td>
+          <td>
+            {{.HomeTeam}}
+            {{if .Score}}<span class="score">{{.Score}}</span>{{else}}<span class="state">vs</span>{{end}}
+            {{.AwayTeam}}
+            {{if .StateLabel}}<small class="state">({{.StateLabel}})</small>{{end}}
+          </td>
+          <td>{{.StageLabel}}</td>
+          <td>{{.Venue}}</td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+    <footer>
+      <p class="state">
+        Last updated
+        {{if .LastSyncedUTC}}<time datetime="{{.LastSyncedUTC}}">{{.LastSyncedUTC}}</time>{{else}}never{{end}}.
+        Times shown in your local timezone.
+      </p>
+    </footer>
+  </main>
+  <script>
+    for (const el of document.querySelectorAll("time[datetime]")) {
+      const d = new Date(el.getAttribute("datetime"));
+      if (!isNaN(d)) {
+        el.textContent = d.toLocaleString(undefined, {
+          weekday: "short", day: "numeric", month: "short",
+          hour: "2-digit", minute: "2-digit"
+        });
+      }
+    }
+  </script>
+</body>
+</html>
