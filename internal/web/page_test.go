@@ -36,7 +36,8 @@ func TestPageEmitsKickoffAsUTCDatetime(t *testing.T) {
 	}
 }
 
-// Scores appear only once a match is finished.
+// Scores appear only once a match is finished; an in-play match shows
+// "vs" and an "In play" label, not a score.
 func TestPageShowsScoreOnlyWhenFinished(t *testing.T) {
 	finished := match("wc-1")
 	finished.Status = fixtures.StatusFinished
@@ -48,11 +49,11 @@ func TestPageShowsScoreOnlyWhenFinished(t *testing.T) {
 
 	body := get(t, seeded(t, finished, inPlay), now, "/").Body.String()
 
-	if !strings.Contains(body, "2&nbsp;–&nbsp;1") && !strings.Contains(body, "2 – 1") {
+	if !strings.Contains(body, `2<span class="sep">:</span>1`) {
 		t.Errorf("finished match score missing from page: %s", body)
 	}
-	if strings.Contains(body, "Spain 0") || strings.Contains(body, "France 0") {
-		t.Errorf("in-play match must not show a score")
+	if got := strings.Count(body, `class="score"`); got != 1 {
+		t.Errorf("got %d score blocks, want 1 (only the finished match)", got)
 	}
 	if !strings.Contains(body, "In play") {
 		t.Errorf("in-play match should be labelled, page: %s", body)
@@ -80,22 +81,22 @@ func TestPageShowsLastSyncedTime(t *testing.T) {
 	}
 }
 
-// Spec: venue exposed only when present. The column appears when any
-// match has a venue and disappears entirely when none do.
-func TestVenueColumnOmittedWhenProviderSendsNoVenues(t *testing.T) {
+// Spec: venue exposed only when present. The card shows it when the
+// match has one and omits it entirely otherwise.
+func TestVenueOmittedWhenAbsent(t *testing.T) {
 	noVenue := match("wc-1")
 	noVenue.Venue = ""
 
 	body := get(t, seeded(t, noVenue), now, "/").Body.String()
-	if strings.Contains(body, "Venue") {
-		t.Errorf("venue column shown despite no venue data: %s", body)
+	if strings.Contains(body, `class="venue"`) {
+		t.Errorf("venue shown despite no venue data: %s", body)
 	}
 }
 
-func TestVenueColumnShownWhenVenuesAvailable(t *testing.T) {
+func TestVenueShownWhenPresent(t *testing.T) {
 	body := get(t, seeded(t, match("wc-1")), now, "/").Body.String()
-	if !strings.Contains(body, "Venue") || !strings.Contains(body, "Estadio Azteca, Mexico City") {
-		t.Errorf("venue column missing despite venue data: %s", body)
+	if !strings.Contains(body, `class="venue"`) || !strings.Contains(body, "Estadio Azteca, Mexico City") {
+		t.Errorf("venue missing despite venue data: %s", body)
 	}
 }
 
@@ -144,22 +145,24 @@ func TestUnnamedTeamsRenderAsTBC(t *testing.T) {
 	}
 }
 
-// Guarantee: TeamFlags — flags hug the score: home name, home flag,
-// score, away flag, away name.
-func TestPageShowsFlagsHuggingTheScore(t *testing.T) {
+// Guarantee: TeamFlags — each side shows its flag with its (linked)
+// name within the card.
+func TestCardShowsFlagAndLinkedName(t *testing.T) {
 	body := get(t, seeded(t, match("wc-1")), now, "/").Body.String()
 
-	if !strings.Contains(body, `<a href="/teams/canada">Canada</a> 🇨🇦`) {
-		t.Errorf("home flag missing after home team name: %s", body)
-	}
-	if !strings.Contains(body, `🇲🇽 <a href="/teams/mexico">Mexico</a>`) {
-		t.Errorf("away flag missing before away team name: %s", body)
+	for _, want := range []string{
+		`<span class="flag">🇨🇦</span>`, `<span class="name"><a href="/teams/canada">Canada</a></span>`,
+		`<span class="flag">🇲🇽</span>`, `<span class="name"><a href="/teams/mexico">Mexico</a></span>`,
+	} {
+		if !strings.Contains(body, want) {
+			t.Errorf("card missing %q: %s", want, body)
+		}
 	}
 }
 
-// Scores sit in a dedicated cell so they align vertically down the
-// page; home names lead it, away names trail it.
-func TestScoresVerticallyAligned(t *testing.T) {
+// Each match is a card: stage + kickoff top-left, a linked group pill
+// top-right, the score flanked by the two sides.
+func TestPageRendersMatchesAsCards(t *testing.T) {
 	finished := match("wc-1")
 	finished.Status = fixtures.StatusFinished
 	finished.HomeScore, finished.AwayScore = intp(2), intp(1)
@@ -168,14 +171,14 @@ func TestScoresVerticallyAligned(t *testing.T) {
 
 	body := get(t, seeded(t, finished, upcoming), now, "/").Body.String()
 
-	if got := strings.Count(body, `<td class="score">`); got != 2 {
-		t.Errorf("got %d dedicated score cells, want one per match (2): %s", got, body)
+	if got := strings.Count(body, `class="card"`); got != 2 {
+		t.Errorf("got %d cards, want one per match (2): %s", got, body)
 	}
-	if got := strings.Count(body, `<td class="home">`); got != 2 {
-		t.Errorf("got %d home cells, want 2", got)
+	if got := strings.Count(body, `class="scoreline"`); got != 2 {
+		t.Errorf("got %d scorelines, want 2", got)
 	}
-	if got := strings.Count(body, `<td class="away">`); got != 2 {
-		t.Errorf("got %d away cells, want 2", got)
+	if !strings.Contains(body, `<span class="stage">Group stage</span>`) {
+		t.Errorf("card missing stage label: %s", body)
 	}
 }
 

@@ -64,19 +64,19 @@ func TestUnknownGroupIsNotFound(t *testing.T) {
 	}
 }
 
-// Stage entries on the main page link to group detail pages; knockout
-// stage entries stay plain labels.
-func TestStageEntriesLinkToGroupPages(t *testing.T) {
+// The group pill on each card links to that group's page; knockout
+// cards carry no group pill.
+func TestGroupPillLinksToGroupPage(t *testing.T) {
 	knockout := withID(match("wc-sf"), "wc-sf")
 	knockout.Stage, knockout.GroupName = fixtures.StageSemiFinal, ""
 	knockout.HomeTeam, knockout.AwayTeam = "Brazil", "Germany"
 
 	body := get(t, seeded(t, match("wc-a1"), knockout), now, "/").Body.String()
 
-	if !strings.Contains(body, `<a href="/groups/A">Group A</a>`) {
-		t.Errorf("group stage entry not linked: %s", body)
+	if !strings.Contains(body, `<a class="group" href="/groups/A">Group A</a>`) {
+		t.Errorf("group pill not linked: %s", body)
 	}
-	if strings.Contains(body, `<a href="/groups/">Semi-final</a>`) || strings.Contains(body, `href="/groups/"`) {
-		t.Errorf("knockout stage entry must not link")
+	if strings.Contains(body, `href="/groups/"`) {
+		t.Errorf("knockout card must not link a group")
 	}
 }

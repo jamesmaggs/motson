@@ -43,18 +43,24 @@ type pageData struct {
 }
 
 type matchView struct {
-	HomeTeam   string
-	AwayTeam   string
-	HomeURL    string // team page link; empty for unnamed sides
-	AwayURL    string
-	HomeFlag   string
-	AwayFlag   string
-	KickoffUTC string
-	Venue      string
-	StageLabel string
-	StageURL   string // link to the group detail page; empty for knockouts
-	Score      string // empty until the match has finished
-	StateLabel string // "In play", "Postponed", "Cancelled" or empty
+	HomeTeam    string
+	AwayTeam    string
+	HomeURL     string // team page link; empty for unnamed sides
+	AwayURL     string
+	HomeFlag    string
+	AwayFlag    string
+	KickoffUTC  string
+	Venue       string
+	StageLabel  string // table stage column: group name, or stage for knockouts
+	StageURL    string // link to the group detail page; empty for knockouts
+	StageName   string // card top-left: always the stage label ("Group stage")
+	GroupName   string // card group pill: "Group A", empty for knockouts
+	GroupURL    string // card group pill link
+	Score       string // combined "2 – 1" for table views; empty until finished
+	HomeGoals   string // card score: home goals, empty until finished
+	AwayGoals   string // card score: away goals
+	Pens        string // "4–2 pens" for a finished shootout, else empty
+	StatusLabel string // "In play", "Postponed", "Cancelled" or empty
 }
 
 var stateLabels = map[fixtures.Status]string{
@@ -118,26 +124,31 @@ func nameOrTBC(team string) string {
 
 func viewOf(m fixtures.Match) matchView {
 	v := matchView{
-		HomeTeam:   nameOrTBC(m.HomeTeam),
-		AwayTeam:   nameOrTBC(m.AwayTeam),
-		HomeURL:    teamURL(m.HomeTeam),
-		AwayURL:    teamURL(m.AwayTeam),
-		HomeFlag:   flagFor(m.HomeTeam),
-		AwayFlag:   flagFor(m.AwayTeam),
-		KickoffUTC: m.KickoffAt.UTC().Format(time.RFC3339),
-		Venue:      m.Venue,
-		StageLabel: m.GroupName,
-		StateLabel: stateLabels[m.Status],
+		HomeTeam:    nameOrTBC(m.HomeTeam),
+		AwayTeam:    nameOrTBC(m.AwayTeam),
+		HomeURL:     teamURL(m.HomeTeam),
+		AwayURL:     teamURL(m.AwayTeam),
+		HomeFlag:    flagFor(m.HomeTeam),
+		AwayFlag:    flagFor(m.AwayTeam),
+		KickoffUTC:  m.KickoffAt.UTC().Format(time.RFC3339),
+		Venue:       m.Venue,
+		StageLabel:  m.GroupName,
+		StageName:   m.Stage.Label(),
+		StatusLabel: stateLabels[m.Status],
 	}
 	if m.Stage != fixtures.StageGroup {
 		v.StageLabel = m.Stage.Label()
 	} else if letter, ok := strings.CutPrefix(m.GroupName, "Group "); ok {
 		v.StageURL = "/groups/" + letter
+		v.GroupName = m.GroupName
+		v.GroupURL = "/groups/" + letter
 	}
 	if m.Status == fixtures.StatusFinished && m.HomeScore != nil && m.AwayScore != nil {
 		v.Score = fmt.Sprintf("%d – %d", *m.HomeScore, *m.AwayScore)
+		v.HomeGoals = fmt.Sprintf("%d", *m.HomeScore)
+		v.AwayGoals = fmt.Sprintf("%d", *m.AwayScore)
 		if m.HomePenalties != nil && m.AwayPenalties != nil {
-			v.StateLabel = fmt.Sprintf("%d–%d pens", *m.HomePenalties, *m.AwayPenalties)
+			v.Pens = fmt.Sprintf("%d–%d pens", *m.HomePenalties, *m.AwayPenalties)
 		}
 	}
 	return v

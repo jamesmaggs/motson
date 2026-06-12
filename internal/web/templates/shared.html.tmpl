@@ -10,7 +10,8 @@
   <style>
     /* Floodlit scoreboard: dark night-match chrome, amber scores,
        Bebas Neue title over Inter data. */
-    body { background: #11151a; color: #e8e6e3; font-family: Inter, -apple-system, system-ui, sans-serif; }
+    html { background: #11151a; }
+    body { background: #11151a; color: #e8e6e3; font-family: Inter, -apple-system, system-ui, sans-serif; min-height: 100vh; }
     main h1, main h2, main p, main th, main td, footer p { color: #e8e6e3; }
     h1 { color: #fff; font-family: "Bebas Neue", Inter, sans-serif; font-weight: 400; font-size: 3rem; letter-spacing: .06em; }
     h2 { color: #fff; font-family: "Bebas Neue", Inter, sans-serif; font-weight: 400; font-size: 1.6rem; letter-spacing: .06em; margin: 2.5rem 0 0; }
@@ -44,6 +45,28 @@
     .state { color: #79838e; font-weight: 400; text-shadow: none; }
     td.score .state { font-size: .7em; }
     footer p { font-size: .75em; }
+
+    /* Match cards (index) */
+    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); grid-auto-rows: 1fr; gap: 1rem; margin: 2.5rem 0; }
+    .card { background: #1f2730; border: 1px solid #2a333d; border-radius: 16px; padding: 1.1rem 1.2rem 1.3rem; box-shadow: none; margin: 0; }
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: .5rem; margin-bottom: 1rem; }
+    .meta { display: flex; flex-direction: column; gap: .25rem; }
+    .stage { text-transform: uppercase; font-size: .62rem; letter-spacing: .1em; color: #8d97a3; }
+    .kickoff { color: #e8e6e3; font-size: .72rem; }
+    .group { font-size: .72rem; padding: .2rem .65rem; border-radius: 999px; background: rgba(47,191,113,.16); color: #5fd99a; white-space: nowrap; text-decoration: none; }
+    .group:hover { background: rgba(47,191,113,.28); }
+    .scoreline { display: grid; grid-template-columns: 1fr auto 1fr; align-items: start; gap: .5rem; }
+    .side { text-align: center; }
+    .flag { font-size: 2.8rem; line-height: 1; }
+    .name { display: block; margin-top: .5rem; font-size: .9rem; font-weight: 300; }
+    .name a { color: inherit; text-decoration: none; }
+    .name a:hover { text-decoration: underline; }
+    .score { font-size: 2rem; font-weight: 700; color: #ffd23f; font-variant-numeric: tabular-nums; white-space: nowrap; padding-top: .5rem; }
+    .score .sep { margin: 0 .3rem; color: #79838e; font-weight: 400; }
+    .vs { font-size: 1.1rem; color: #79838e; padding-top: .9rem; }
+    .pens { display: block; font-size: .68rem; font-weight: 400; color: #79838e; margin-top: .2rem; }
+    .venue { text-align: center; color: #79838e; font-size: .72rem; margin-top: .9rem; }
+    .status { text-align: center; color: #79838e; font-size: .72rem; margin-top: .9rem; }
   </style>
 </head>
 {{end}}
@@ -52,7 +75,8 @@
           <td class="home">{{if .HomeURL}}<a href="{{.HomeURL}}">{{.HomeTeam}}</a>{{else}}{{.HomeTeam}}{{end}}{{if .HomeFlag}} {{.HomeFlag}}{{end}}</td>
           <td class="score">
             {{if .Score}}{{.Score}}{{else}}<span class="state">vs</span>{{end}}
-            {{if .StateLabel}}<br><small class="state">{{.StateLabel}}</small>{{end}}
+            {{if .Pens}}<br><small class="state">{{.Pens}}</small>{{end}}
+            {{if .StatusLabel}}<br><small class="state">{{.StatusLabel}}</small>{{end}}
           </td>
           <td class="away">{{if .AwayFlag}}{{.AwayFlag}} {{end}}{{if .AwayURL}}<a href="{{.AwayURL}}">{{.AwayTeam}}</a>{{else}}{{.AwayTeam}}{{end}}</td>
 {{end}}

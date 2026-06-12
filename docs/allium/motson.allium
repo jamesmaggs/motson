@@ -261,9 +261,8 @@ surface FixturesPage {
         -- without a flag; provider-supplied names always win.
 
     @guarantee TeamFlags
-        -- Each fixture reads: home team name, home flag, score (or
-        -- "vs"), away flag, away team name — flags hug the score.
-        -- Teams whose name does not identify a nation (knockout
+        -- Each team appears with its national flag alongside its
+        -- name. Teams whose name does not identify a nation (knockout
         -- placeholders such as "Winner Group A") render without a
         -- flag rather than with a wrong or broken one.
 
@@ -272,11 +271,12 @@ surface FixturesPage {
         -- unnamed (TBC) sides do not link.
 
     @guidance
-        -- Present matches in kickoff order; grouping by stage or by
-        -- day is a presentation choice left to implementation. Scores
-        -- align vertically down the page so results are scannable.
-        -- Each group-stage match's stage entry links to that group's
-        -- GroupDetailPage; knockout stage entries are plain labels.
+        -- Matches are presented as cards in kickoff order: stage and
+        -- kickoff time top-left, the group (a link to its
+        -- GroupDetailPage) top-right, and the score — or "vs" before
+        -- kick-off — flanked by each team's flag and name. Knockout
+        -- cards carry no group. Venue, when present, sits with the
+        -- score.
 
     related:
         GroupFixturesPage(schedule)

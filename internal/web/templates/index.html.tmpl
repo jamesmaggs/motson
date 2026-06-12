@@ -11,21 +11,32 @@
         to get scores as events update, or browse by <a href="/groups">group</a> or <a href="/teams">team</a>.
       </p>
     </header>
-    <table>
-      <thead>
-        <tr><th>Kick-off</th><th colspan="3" class="match">Match</th><th>Stage</th>{{if .HasVenues}}<th>Venue</th>{{end}}</tr>
-      </thead>
-      <tbody>
-        {{range .Matches}}
-        <tr class="fixture">
-          <td><time datetime="{{.KickoffUTC}}">{{.KickoffUTC}}</time></td>
-          {{template "matchCells" .}}
-          <td>{{if .StageURL}}<a href="{{.StageURL}}">{{.StageLabel}}</a>{{else}}{{.StageLabel}}{{end}}</td>
-          {{if $.HasVenues}}<td>{{.Venue}}</td>{{end}}
-        </tr>
-        {{end}}
-      </tbody>
-    </table>
+    <div class="cards">
+      {{range .Matches}}
+      <article class="card">
+        <div class="card-top">
+          <div class="meta">
+            <span class="stage">{{.StageName}}</span>
+            <time class="kickoff" datetime="{{.KickoffUTC}}">{{.KickoffUTC}}</time>
+          </div>
+          {{if .GroupName}}<a class="group" href="{{.GroupURL}}">{{.GroupName}}</a>{{end}}
+        </div>
+        <div class="scoreline">
+          <div class="side">
+            <span class="flag">{{.HomeFlag}}</span>
+            <span class="name">{{if .HomeURL}}<a href="{{.HomeURL}}">{{.HomeTeam}}</a>{{else}}{{.HomeTeam}}{{end}}</span>
+          </div>
+          {{if .HomeGoals}}<div class="score">{{.HomeGoals}}<span class="sep">:</span>{{.AwayGoals}}{{if .Pens}}<span class="pens">{{.Pens}}</span>{{end}}</div>{{else}}<div class="vs">vs</div>{{end}}
+          <div class="side">
+            <span class="flag">{{.AwayFlag}}</span>
+            <span class="name">{{if .AwayURL}}<a href="{{.AwayURL}}">{{.AwayTeam}}</a>{{else}}{{.AwayTeam}}{{end}}</span>
+          </div>
+        </div>
+        {{if .Venue}}<div class="venue">{{.Venue}}</div>{{end}}
+        {{if .StatusLabel}}<div class="status">{{.StatusLabel}}</div>{{end}}
+      </article>
+      {{end}}
+    </div>
 {{template "footer" .}}
 </body>
 </html>
