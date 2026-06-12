@@ -38,15 +38,6 @@ type matchView struct {
 	StateLabel string // "In play", "Postponed", "Cancelled" or empty
 }
 
-var stageLabels = map[fixtures.Stage]string{
-	fixtures.StageRoundOf32:    "Round of 32",
-	fixtures.StageRoundOf16:    "Round of 16",
-	fixtures.StageQuarterFinal: "Quarter-final",
-	fixtures.StageSemiFinal:    "Semi-final",
-	fixtures.StageThirdPlace:   "Third place",
-	fixtures.StageFinal:        "Final",
-}
-
 var stateLabels = map[fixtures.Status]string{
 	fixtures.StatusInPlay:    "In play",
 	fixtures.StatusPostponed: "Postponed",
@@ -84,10 +75,17 @@ func page(store fixtures.Store, host string) http.HandlerFunc {
 	}
 }
 
+func nameOrTBC(team string) string {
+	if team == "" {
+		return "TBC"
+	}
+	return team
+}
+
 func viewOf(m fixtures.Match) matchView {
 	v := matchView{
-		HomeTeam:   m.HomeTeam,
-		AwayTeam:   m.AwayTeam,
+		HomeTeam:   nameOrTBC(m.HomeTeam),
+		AwayTeam:   nameOrTBC(m.AwayTeam),
 		HomeFlag:   flagFor(m.HomeTeam),
 		AwayFlag:   flagFor(m.AwayTeam),
 		KickoffUTC: m.KickoffAt.UTC().Format(time.RFC3339),
@@ -96,7 +94,7 @@ func viewOf(m fixtures.Match) matchView {
 		StateLabel: stateLabels[m.Status],
 	}
 	if m.Stage != fixtures.StageGroup {
-		v.StageLabel = stageLabels[m.Stage]
+		v.StageLabel = m.Stage.Label()
 	}
 	if m.Status == fixtures.StatusFinished && m.HomeScore != nil && m.AwayScore != nil {
 		v.Score = fmt.Sprintf("%d – %d", *m.HomeScore, *m.AwayScore)

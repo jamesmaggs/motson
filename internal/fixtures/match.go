@@ -28,6 +28,19 @@ const (
 	StageFinal        Stage = "final"
 )
 
+var stageLabels = map[Stage]string{
+	StageGroup:        "Group stage",
+	StageRoundOf32:    "Round of 32",
+	StageRoundOf16:    "Round of 16",
+	StageQuarterFinal: "Quarter-final",
+	StageSemiFinal:    "Semi-final",
+	StageThirdPlace:   "Third place",
+	StageFinal:        "Final",
+}
+
+// Label is the stage's human-readable name.
+func (s Stage) Label() string { return stageLabels[s] }
+
 // Status is the match status the provider last reported. The lifecycle
 // is owned by the provider; Motson mirrors it without enforcing
 // transitions.

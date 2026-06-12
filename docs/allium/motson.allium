@@ -202,6 +202,13 @@ surface CalendarFeed {
     @guarantee PublicAccess
         -- The feed requires no authentication; any client may fetch it.
 
+    @guarantee UndeterminedFixtures
+        -- The provider names teams only once determined; until then it
+        -- sends empty names. A fixture with no named teams is titled
+        -- with its stage (e.g. "Round of 32"). As soon as the provider
+        -- names a team it appears, with "TBC" standing in for a side
+        -- still unknown. Provider-supplied names always win.
+
     @guidance
         -- A finished match's score belongs in the event title (e.g.
         -- "Canada 2-1 Mexico") so it is visible without opening the
@@ -234,6 +241,10 @@ surface FixturesPage {
 
     @guarantee PublicAccess
         -- The page requires no authentication.
+
+    @guarantee UndeterminedFixtures
+        -- A side the provider has not yet named renders as "TBC",
+        -- without a flag; provider-supplied names always win.
 
     @guarantee TeamFlags
         -- Each fixture reads: home team name, home flag, score (or

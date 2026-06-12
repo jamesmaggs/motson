@@ -99,6 +99,25 @@ func TestVenueColumnShownWhenVenuesAvailable(t *testing.T) {
 	}
 }
 
+// Guarantee: UndeterminedFixtures — an unnamed side renders as "TBC"
+// with no flag.
+func TestUnnamedTeamsRenderAsTBC(t *testing.T) {
+	m := match("wc-r32")
+	m.Stage, m.GroupName = fixtures.StageRoundOf32, ""
+	m.HomeTeam, m.AwayTeam = "", ""
+
+	body := get(t, seeded(t, m), now, "/").Body.String()
+	if got := strings.Count(body, "TBC"); got != 2 {
+		t.Errorf("got %d TBC placeholders, want 2: %s", got, body)
+	}
+	for _, r := range body {
+		if r >= 0x1F1E6 && r <= 0x1F1FF {
+			t.Error("TBC side must not carry a flag")
+			break
+		}
+	}
+}
+
 // Guarantee: TeamFlags — flags hug the score: home name, home flag,
 // score, away flag, away name.
 func TestPageShowsFlagsHuggingTheScore(t *testing.T) {

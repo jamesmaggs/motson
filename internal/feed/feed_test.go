@@ -186,6 +186,36 @@ func TestEventDescriptionExposesStatus(t *testing.T) {
 	}
 }
 
+// Guarantee: UndeterminedFixtures — a fixture with no named teams is
+// titled with its stage; one named team appears alongside "TBC".
+func TestUndeterminedFixtureTitledWithStage(t *testing.T) {
+	m := scheduled()
+	m.Stage, m.GroupName = fixtures.StageRoundOf32, ""
+	m.HomeTeam, m.AwayTeam = "", ""
+	if got, want := prop(t, event(t, render(t, m)), ics.ComponentPropertySummary), "Round of 32"; got != want {
+		t.Errorf("SUMMARY = %q, want %q", got, want)
+	}
+
+	m.Stage = fixtures.StageFinal
+	if got, want := prop(t, event(t, render(t, m)), ics.ComponentPropertySummary), "Final"; got != want {
+		t.Errorf("SUMMARY = %q, want %q", got, want)
+	}
+}
+
+func TestPartiallyDeterminedFixtureShowsKnownTeam(t *testing.T) {
+	m := scheduled()
+	m.Stage, m.GroupName = fixtures.StageRoundOf32, ""
+	m.AwayTeam = ""
+	if got, want := prop(t, event(t, render(t, m)), ics.ComponentPropertySummary), "Canada vs TBC"; got != want {
+		t.Errorf("SUMMARY = %q, want %q", got, want)
+	}
+
+	m.HomeTeam, m.AwayTeam = "", "Mexico"
+	if got, want := prop(t, event(t, render(t, m)), ics.ComponentPropertySummary), "TBC vs Mexico"; got != want {
+		t.Errorf("SUMMARY = %q, want %q", got, want)
+	}
+}
+
 // Spec: venue exposed only when present — an absent venue must not
 // produce an empty LOCATION property.
 func TestNoLocationPropertyWhenVenueAbsent(t *testing.T) {

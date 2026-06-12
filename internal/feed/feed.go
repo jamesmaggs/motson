@@ -37,6 +37,13 @@ func Render(host string, matches []fixtures.Match) (string, error) {
 	return cal.Serialize(), nil
 }
 
+func nameOrTBC(team string) string {
+	if team == "" {
+		return "TBC"
+	}
+	return team
+}
+
 // statusLabels expose the spec's provider_status on every event.
 var statusLabels = map[fixtures.Status]string{
 	fixtures.StatusScheduled: "Scheduled",
@@ -61,9 +68,14 @@ func eventStatus(s fixtures.Status) ics.ObjectStatus {
 
 // summary is the event title: "Home vs Away" until the match finishes,
 // then "Home 2-1 Away", with "(4-2 pens)" appended after a shootout.
+// A fixture with no named teams is titled with its stage; a single
+// named team appears alongside "TBC" (UndeterminedFixtures).
 func summary(m fixtures.Match) string {
+	if m.HomeTeam == "" && m.AwayTeam == "" {
+		return m.Stage.Label()
+	}
 	if m.Status != fixtures.StatusFinished || m.HomeScore == nil || m.AwayScore == nil {
-		return fmt.Sprintf("%s vs %s", m.HomeTeam, m.AwayTeam)
+		return fmt.Sprintf("%s vs %s", nameOrTBC(m.HomeTeam), nameOrTBC(m.AwayTeam))
 	}
 	var b strings.Builder
 	fmt.Fprintf(&b, "%s %d-%d %s", m.HomeTeam, *m.HomeScore, *m.AwayScore, m.AwayTeam)
