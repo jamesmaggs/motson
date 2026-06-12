@@ -86,6 +86,20 @@ entity Match {
     ends_at: kickoff_at + (if stage = group: config.group_match_duration else: config.knockout_match_duration)
 }
 
+-- A team's standing within its group, derived from finished
+-- group-stage matches only.
+value GroupStanding {
+    team: String
+    played: Integer
+    won: Integer
+    drawn: Integer
+    lost: Integer
+    goals_for: Integer
+    goals_against: Integer
+    goal_difference: goals_for - goals_against
+    points: won * 3 + drawn
+}
+
 -- Singleton pacing the hourly refresh.
 entity SyncSchedule {
     next_run_at: Timestamp
@@ -257,9 +271,12 @@ surface FixturesPage {
         -- Present matches in kickoff order; grouping by stage or by
         -- day is a presentation choice left to implementation. Scores
         -- align vertically down the page so results are scannable.
+        -- Each group-stage match's stage entry links to that group's
+        -- GroupDetailPage; knockout stage entries are plain labels.
 
     related:
         GroupFixturesPage(schedule)
+        GroupDetailPage(schedule)
 }
 
 surface GroupFixturesPage {
@@ -297,6 +314,52 @@ surface GroupFixturesPage {
 
     related:
         FixturesPage(schedule)
+}
+
+surface GroupDetailPage {
+    context schedule: SyncSchedule
+
+    exposes:
+        schedule.last_synced_at
+        GroupStanding
+        for match in Matches where stage = group:
+            match.home_team
+            match.away_team
+            match.kickoff_at
+            match.venue when match.venue != null
+            match.provider_status
+            match.home_score when match.provider_status = finished
+            match.away_score when match.provider_status = finished
+
+    @guarantee OnePagePerGroup
+        -- One instance of this surface exists per group (A through
+        -- L). An instance exposes only its own group's standings and
+        -- matches: the standings table first, the group's results
+        -- and fixtures below it in kickoff order. Requests for a
+        -- group that does not exist are refused as not found.
+
+    @guarantee StandingsOrder
+        -- Standings rank by points, then goal difference, then goals
+        -- scored, then team name. Only finished matches contribute;
+        -- every team named in the group's fixtures appears, with
+        -- zeroes before it has played. (Deliberate simplification:
+        -- FIFA's head-to-head tiebreakers are not applied.)
+
+    @guarantee PublicAccess
+        -- The page requires no authentication.
+
+    @guarantee TeamFlags
+        -- Same reading order as FixturesPage in the fixtures list:
+        -- home name, home flag, score, away flag, away name.
+
+    @guidance
+        -- Reached from the stage entries of FixturesPage (each
+        -- "Group X" stage label links to its group's page) and
+        -- addressed by group letter (e.g. /groups/A).
+
+    related:
+        FixturesPage(schedule)
+        GroupFixturesPage(schedule)
 }
 
 surface HealthCheck {

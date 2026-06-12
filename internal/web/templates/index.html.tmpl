@@ -20,7 +20,7 @@
         <tr class="fixture">
           <td><time datetime="{{.KickoffUTC}}">{{.KickoffUTC}}</time></td>
           {{template "matchCells" .}}
-          <td>{{.StageLabel}}</td>
+          <td>{{if .StageURL}}<a href="{{.StageURL}}">{{.StageLabel}}</a>{{else}}{{.StageLabel}}{{end}}</td>
           {{if $.HasVenues}}<td>{{.Venue}}</td>{{end}}
         </tr>
         {{end}}

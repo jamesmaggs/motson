@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+{{template "head" .}}
+<body>
+  <main class="container">
+    <header>
+      <h1>⚽ World Cup 2026</h1>
+      <p>
+        {{.GroupName}} table, results and fixtures, updated hourly.
+        <a href="/groups">All groups</a> · <a href="/">All fixtures</a>.
+      </p>
+    </header>
+    <h2>{{.GroupName}}</h2>
+    <table>
+      <thead>
+        <tr><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th></tr>
+      </thead>
+      <tbody>
+        {{range .Standings}}
+        <tr>
+          <td>{{.Team}}</td>
+          <td>{{.Played}}</td>
+          <td>{{.Won}}</td>
+          <td>{{.Drawn}}</td>
+          <td>{{.Lost}}</td>
+          <td>{{.GoalsFor}}</td>
+          <td>{{.GoalsAgainst}}</td>
+          <td>{{.GoalDifference}}</td>
+          <td class="points">{{.Points}}</td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+    <table>
+      <thead>
+        <tr><th>Kick-off</th><th colspan="3" class="match">Match</th>{{if .HasVenues}}<th>Venue</th>{{end}}</tr>
+      </thead>
+      <tbody>
+        {{range .Matches}}
+        <tr class="fixture">
+          <td><time datetime="{{.KickoffUTC}}">{{.KickoffUTC}}</time></td>
+          {{template "matchCells" .}}
+          {{if $.HasVenues}}<td>{{.Venue}}</td>{{end}}
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+{{template "footer" .}}
+</body>
+</html>

@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"net/http"
 	"runtime/debug"
+	"strings"
 	"time"
 
 	"github.com/jamesmaggs/motson/internal/fixtures"
@@ -49,6 +50,7 @@ type matchView struct {
 	KickoffUTC string
 	Venue      string
 	StageLabel string
+	StageURL   string // link to the group detail page; empty for knockouts
 	Score      string // empty until the match has finished
 	StateLabel string // "In play", "Postponed", "Cancelled" or empty
 }
@@ -125,6 +127,8 @@ func viewOf(m fixtures.Match) matchView {
 	}
 	if m.Stage != fixtures.StageGroup {
 		v.StageLabel = m.Stage.Label()
+	} else if letter, ok := strings.CutPrefix(m.GroupName, "Group "); ok {
+		v.StageURL = "/groups/" + letter
 	}
 	if m.Status == fixtures.StatusFinished && m.HomeScore != nil && m.AwayScore != nil {
 		v.Score = fmt.Sprintf("%d – %d", *m.HomeScore, *m.AwayScore)
