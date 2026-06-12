@@ -203,8 +203,10 @@ surface CalendarFeed {
     @guidance
         -- A finished match's score belongs in the event title (e.g.
         -- "Canada 2-1 Mexico") so it is visible without opening the
-        -- event. Cancelled matches are marked cancelled rather than
-        -- removed, per iCalendar status semantics.
+        -- event. provider_status is exposed on every event: as the
+        -- iCalendar event status (cancelled -> CANCELLED, postponed ->
+        -- TENTATIVE, otherwise CONFIRMED) and as a human-readable
+        -- label in the event description.
 }
 
 surface FixturesPage {

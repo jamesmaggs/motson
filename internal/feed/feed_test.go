@@ -150,6 +150,42 @@ func TestCancelledMatchMarkedCancelled(t *testing.T) {
 	}
 }
 
+// Postponed matches are tentative, everything else confirmed: the
+// closest iCalendar rendering of the spec's provider_status exposure.
+func TestEventStatusReflectsMatchStatus(t *testing.T) {
+	postponed := scheduled()
+	postponed.Status = fixtures.StatusPostponed
+	e := event(t, render(t, postponed))
+	if got := prop(t, e, ics.ComponentPropertyStatus); got != "TENTATIVE" {
+		t.Errorf("postponed: STATUS = %q, want TENTATIVE", got)
+	}
+
+	e = event(t, render(t, scheduled()))
+	if got := prop(t, e, ics.ComponentPropertyStatus); got != "CONFIRMED" {
+		t.Errorf("scheduled: STATUS = %q, want CONFIRMED", got)
+	}
+}
+
+// Obligation: surface-exposure.CalendarFeed — provider_status is
+// exposed on every event via its description.
+func TestEventDescriptionExposesStatus(t *testing.T) {
+	cases := map[fixtures.Status]string{
+		fixtures.StatusScheduled: "Scheduled",
+		fixtures.StatusInPlay:    "In play",
+		fixtures.StatusFinished:  "Finished",
+		fixtures.StatusPostponed: "Postponed",
+		fixtures.StatusCancelled: "Cancelled",
+	}
+	for status, want := range cases {
+		m := scheduled()
+		m.Status = status
+		e := event(t, render(t, m))
+		if got := prop(t, e, ics.ComponentPropertyDescription); !strings.Contains(got, want) {
+			t.Errorf("status %s: DESCRIPTION = %q, want it to contain %q", status, got, want)
+		}
+	}
+}
+
 func TestFeedRendersOneEventPerMatch(t *testing.T) {
 	a, b := scheduled(), scheduled()
 	b.ProviderMatchID = "wc-2"

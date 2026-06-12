@@ -26,11 +26,32 @@ func Render(host string, matches []fixtures.Match) (string, error) {
 		e.SetStartAt(m.KickoffAt.UTC())
 		e.SetEndAt(m.EndsAt().UTC())
 		e.SetLocation(m.Venue)
-		if m.Status == fixtures.StatusCancelled {
-			e.SetStatus(ics.ObjectStatusCancelled)
-		}
+		e.SetStatus(eventStatus(m.Status))
+		e.SetDescription(statusLabels[m.Status])
 	}
 	return cal.Serialize(), nil
+}
+
+// statusLabels expose the spec's provider_status on every event.
+var statusLabels = map[fixtures.Status]string{
+	fixtures.StatusScheduled: "Scheduled",
+	fixtures.StatusInPlay:    "In play",
+	fixtures.StatusFinished:  "Finished",
+	fixtures.StatusPostponed: "Postponed",
+	fixtures.StatusCancelled: "Cancelled",
+}
+
+// eventStatus maps provider_status onto iCalendar's event statuses:
+// postponed is tentative, cancelled is cancelled, the rest confirmed.
+func eventStatus(s fixtures.Status) ics.ObjectStatus {
+	switch s {
+	case fixtures.StatusCancelled:
+		return ics.ObjectStatusCancelled
+	case fixtures.StatusPostponed:
+		return ics.ObjectStatusTentative
+	default:
+		return ics.ObjectStatusConfirmed
+	}
 }
 
 // summary is the event title: "Home vs Away" until the match finishes,
