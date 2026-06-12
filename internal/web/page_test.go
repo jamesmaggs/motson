@@ -99,16 +99,38 @@ func TestVenueColumnShownWhenVenuesAvailable(t *testing.T) {
 	}
 }
 
-// Guarantee: TeamFlags — the home team's flag precedes its name, the
-// away team's flag follows its name.
-func TestPageShowsFlagsAroundTeamNames(t *testing.T) {
+// Guarantee: TeamFlags — flags hug the score: home name, home flag,
+// score, away flag, away name.
+func TestPageShowsFlagsHuggingTheScore(t *testing.T) {
 	body := get(t, seeded(t, match("wc-1")), now, "/").Body.String()
 
-	if !strings.Contains(body, "🇨🇦 Canada") {
-		t.Errorf("home flag missing before home team name: %s", body)
+	if !strings.Contains(body, "Canada 🇨🇦") {
+		t.Errorf("home flag missing after home team name: %s", body)
 	}
-	if !strings.Contains(body, "Mexico 🇲🇽") {
-		t.Errorf("away flag missing after away team name: %s", body)
+	if !strings.Contains(body, "🇲🇽 Mexico") {
+		t.Errorf("away flag missing before away team name: %s", body)
+	}
+}
+
+// Scores sit in a dedicated cell so they align vertically down the
+// page; home names lead it, away names trail it.
+func TestScoresVerticallyAligned(t *testing.T) {
+	finished := match("wc-1")
+	finished.Status = fixtures.StatusFinished
+	finished.HomeScore, finished.AwayScore = intp(2), intp(1)
+	upcoming := withID(match("wc-2"), "wc-2")
+	upcoming.HomeTeam, upcoming.AwayTeam = "Spain", "France"
+
+	body := get(t, seeded(t, finished, upcoming), now, "/").Body.String()
+
+	if got := strings.Count(body, `<td class="score">`); got != 2 {
+		t.Errorf("got %d dedicated score cells, want one per match (2): %s", got, body)
+	}
+	if got := strings.Count(body, `<td class="home">`); got != 2 {
+		t.Errorf("got %d home cells, want 2", got)
+	}
+	if got := strings.Count(body, `<td class="away">`); got != 2 {
+		t.Errorf("got %d away cells, want 2", got)
 	}
 }
 

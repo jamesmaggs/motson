@@ -8,8 +8,10 @@
   <link rel="alternate" type="text/calendar" title="World Cup 2026 calendar" href="/calendar.ics">
   <style>
     .fixture td:first-child { white-space: nowrap; }
-    .score { font-weight: bold; white-space: nowrap; }
-    .state { color: var(--pico-muted-color); }
+    td.home { text-align: right; }
+    td.score { text-align: center; font-weight: bold; white-space: nowrap; }
+    td.away { text-align: left; }
+    .state { color: var(--pico-muted-color); font-weight: normal; }
   </style>
 </head>
 <body>
@@ -24,18 +26,18 @@
     </header>
     <table>
       <thead>
-        <tr><th>Kick-off</th><th>Match</th><th>Stage</th>{{if .HasVenues}}<th>Venue</th>{{end}}</tr>
+        <tr><th>Kick-off</th><th colspan="3">Match</th><th>Stage</th>{{if .HasVenues}}<th>Venue</th>{{end}}</tr>
       </thead>
       <tbody>
         {{range .Matches}}
         <tr class="fixture">
           <td><time datetime="{{.KickoffUTC}}">{{.KickoffUTC}}</time></td>
-          <td>
-            {{if .HomeFlag}}{{.HomeFlag}} {{end}}{{.HomeTeam}}
-            {{if .Score}}<span class="score">{{.Score}}</span>{{else}}<span class="state">vs</span>{{end}}
-            {{.AwayTeam}}{{if .AwayFlag}} {{.AwayFlag}}{{end}}
-            {{if .StateLabel}}<small class="state">({{.StateLabel}})</small>{{end}}
+          <td class="home">{{.HomeTeam}}{{if .HomeFlag}} {{.HomeFlag}}{{end}}</td>
+          <td class="score">
+            {{if .Score}}{{.Score}}{{else}}<span class="state">vs</span>{{end}}
+            {{if .StateLabel}}<br><small class="state">{{.StateLabel}}</small>{{end}}
           </td>
+          <td class="away">{{if .AwayFlag}}{{.AwayFlag}} {{end}}{{.AwayTeam}}</td>
           <td>{{.StageLabel}}</td>
           {{if $.HasVenues}}<td>{{.Venue}}</td>{{end}}
         </tr>
