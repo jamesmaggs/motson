@@ -73,15 +73,17 @@
     /* Full-width site header above a two-column layout. The mascot is
        sized in rem so it scales with the header's type, and sits flush
        against the bottom border on the right. */
-    /* Reset Pico's body>header padding-block, which otherwise sits
-       between the content and the border. */
-    .site-header { border-bottom: 1px solid #232a32; padding: 0; }
+    /* Sticky header: the page scrolls up behind it. Opaque background
+       hides the content passing beneath; a subtle glow sits below the
+       border. Pico's body>header padding-block is reset. */
+    .site-header { position: sticky; top: 0; z-index: 10; background: #11151a; border-bottom: 1px solid #232a32; padding: 0; }
     .site-header-inner { display: flex; justify-content: space-between; align-items: flex-end; max-width: 1180px; margin: 0 auto; padding: 1.2rem 1.5rem 0; }
     .site-header h1 { margin: 0 0 1.2rem; }
     .site-header .mascot { height: 6rem; width: auto; display: block; }
     .layout { display: flex; gap: 2rem; max-width: 1180px; margin: 0 auto; padding: 1.5rem; align-items: flex-start; }
     .content { flex: 1 1 auto; min-width: 0; }
     .content .intro { margin-top: 0; color: #8d97a3; }
+    .content .subscribe { margin-top: 0; }
     /* The sidebar scrolls with the page so the full team list is reachable.
        Its background sits between the page (#11151a) and the cards (#1f2730). */
     .sidebar { flex: 0 0 260px; background: #181e26; border-radius: 12px; padding: .5rem 1.25rem 1rem .75rem; }

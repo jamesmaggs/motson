@@ -6,10 +6,8 @@
   <div class="layout">
     {{template "sidebar" .Nav}}
     <main class="content">
-      <p class="intro">
-        Fixtures and scores, updated hourly.
+      <p class="subscribe">
         <a href="webcal://{{.FeedHost}}/calendar.ics">Subscribe in your calendar</a>
-        to get scores as events update.
       </p>
     <div class="cards">
       {{range .Matches}}
