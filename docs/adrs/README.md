@@ -10,6 +10,7 @@
 | [0006](0006-idempotent-schema-at-boot.md) | Idempotent schema at boot | Accepted |
 | [0007](0007-fake-repository-with-shared-contract-suite.md) | Fake repository with a shared contract suite | Accepted |
 | [0008](0008-staleness-aware-health-endpoint-with-external-monitor.md) | Staleness-aware health endpoint with external monitor | Accepted |
-| [0009](0009-github-actions-ci-with-railway-auto-deploy.md) | GitHub Actions CI with Railway auto-deploy | Accepted |
+| [0009](0009-github-actions-ci-with-railway-auto-deploy.md) | GitHub Actions CI with Railway auto-deploy | Superseded-by-0012 |
 | [0010](0010-server-rendered-page-with-local-time-js-and-classless-css.md) | Server-rendered page with local-time JS and classless CSS | Accepted |
 | [0011](0011-serve-motson-at-motson-jamesmaggs-com.md) | Serve Motson at motson.jamesmaggs.com | Accepted |
+| [0012](0012-deploy-from-github-actions-with-the-railway-cli.md) | Deploy from GitHub Actions with the Railway CLI | Accepted |

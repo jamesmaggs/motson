@@ -1,6 +1,6 @@
 # 0009. GitHub Actions CI with Railway auto-deploy
 
-- Status: Accepted
+- Status: Superseded-by-0012 (deploy mechanism; CI content unchanged)
 - Date: 2026-06-12
 
 ## Context and drivers

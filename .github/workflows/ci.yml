@@ -35,3 +35,14 @@ jobs:
         run: go vet ./...
       - name: Test (contract suite runs against real Postgres)
         run: go test ./...
+
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Deploy to Railway
+        run: npx -y @railway/cli@4 up --service motson --ci
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
