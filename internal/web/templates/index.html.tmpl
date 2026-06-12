@@ -17,6 +17,7 @@
     table { --pico-background-color: transparent; font-size: .85em; margin-top: 2.5rem; margin-bottom: 2.5rem; }
     tbody td { font-weight: 300; }
     thead th { color: #8d97a3; border-bottom: 2px solid #2a313a; text-transform: uppercase; font-size: .8em; letter-spacing: .08em; }
+    thead th.match { text-align: center; }
     tbody td { border-color: #232a32; }
     tbody tr:hover { background: #171c22; }
     a { color: #ffd23f; }
@@ -41,7 +42,7 @@
     </header>
     <table>
       <thead>
-        <tr><th>Kick-off</th><th colspan="3">Match</th><th>Stage</th>{{if .HasVenues}}<th>Venue</th>{{end}}</tr>
+        <tr><th>Kick-off</th><th colspan="3" class="match">Match</th><th>Stage</th>{{if .HasVenues}}<th>Venue</th>{{end}}</tr>
       </thead>
       <tbody>
         {{range .Matches}}
