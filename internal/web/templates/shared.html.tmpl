@@ -76,8 +76,11 @@
     /* Sticky header: the page scrolls up behind it. Opaque background
        hides the content passing beneath; a subtle glow sits below the
        border. Pico's body>header padding-block is reset. */
-    .site-header { position: sticky; top: 0; z-index: 10; background: #11151a; border-bottom: 1px solid #232a32; padding: 0; }
-    .site-header-inner { display: flex; justify-content: space-between; align-items: flex-end; max-width: 1180px; margin: 0 auto; padding: 1.2rem 1.5rem 0; }
+    .site-header { position: sticky; top: 0; z-index: 10; background: #11151a; padding: 0; }
+    .site-header-inner { position: relative; display: flex; justify-content: space-between; align-items: flex-end; max-width: 1180px; margin: 0 auto; padding: 1.2rem 1.5rem 0; }
+    /* Bottom border as a gradient: solid under the mascot, fading out
+       on either side of it. */
+    .site-header-inner::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: linear-gradient(to right, transparent 70%, #232a32 87%, #232a32 96%, transparent 100%); }
     .site-header h1 { margin: 0 0 1.2rem; }
     .site-header .mascot { height: 6rem; width: auto; display: block; }
     .layout { display: flex; gap: 1rem; max-width: 1180px; margin: 0 auto; padding: 1.5rem; align-items: flex-start; }
