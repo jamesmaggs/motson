@@ -28,6 +28,8 @@ type pageData struct {
 type matchView struct {
 	HomeTeam   string
 	AwayTeam   string
+	HomeFlag   string
+	AwayFlag   string
 	KickoffUTC string
 	Venue      string
 	StageLabel string
@@ -82,6 +84,8 @@ func viewOf(m fixtures.Match) matchView {
 	v := matchView{
 		HomeTeam:   m.HomeTeam,
 		AwayTeam:   m.AwayTeam,
+		HomeFlag:   flagFor(m.HomeTeam),
+		AwayFlag:   flagFor(m.AwayTeam),
 		KickoffUTC: m.KickoffAt.UTC().Format(time.RFC3339),
 		Venue:      m.Venue,
 		StageLabel: m.GroupName,

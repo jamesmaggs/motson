@@ -233,6 +233,13 @@ surface FixturesPage {
     @guarantee PublicAccess
         -- The page requires no authentication.
 
+    @guarantee TeamFlags
+        -- Each team name is accompanied by its national flag: before
+        -- the home team's name and after the away team's name. Teams
+        -- whose name does not identify a nation (knockout
+        -- placeholders such as "Winner Group A") render without a
+        -- flag rather than with a wrong or broken one.
+
     @guidance
         -- Present matches in kickoff order; grouping by stage or by
         -- day is a presentation choice left to implementation.

@@ -80,6 +80,38 @@ func TestPageShowsLastSyncedTime(t *testing.T) {
 	}
 }
 
+// Guarantee: TeamFlags — the home team's flag precedes its name, the
+// away team's flag follows its name.
+func TestPageShowsFlagsAroundTeamNames(t *testing.T) {
+	body := get(t, seeded(t, match("wc-1")), now, "/").Body.String()
+
+	if !strings.Contains(body, "🇨🇦 Canada") {
+		t.Errorf("home flag missing before home team name: %s", body)
+	}
+	if !strings.Contains(body, "Mexico 🇲🇽") {
+		t.Errorf("away flag missing after away team name: %s", body)
+	}
+}
+
+// Guarantee: TeamFlags — placeholder names render without a flag
+// rather than with a wrong or broken one.
+func TestPlaceholderTeamsRenderWithoutFlags(t *testing.T) {
+	m := match("wc-final")
+	m.Stage, m.GroupName = fixtures.StageFinal, ""
+	m.HomeTeam, m.AwayTeam = "Winner SF1", "Winner SF2"
+
+	body := get(t, seeded(t, m), now, "/").Body.String()
+	if !strings.Contains(body, "Winner SF1") || !strings.Contains(body, "Winner SF2") {
+		t.Fatalf("placeholder names missing: %s", body)
+	}
+	for _, r := range body {
+		if r >= 0x1F1E6 && r <= 0x1F1FF { // regional indicator symbols
+			t.Errorf("placeholder page contains a flag: %s", body)
+			break
+		}
+	}
+}
+
 // The subscribe link must use the webcal scheme so calendar clients
 // subscribe (and auto-update) rather than import a one-off copy.
 func TestPageSubscribeLinkUsesWebcalScheme(t *testing.T) {

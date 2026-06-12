@@ -31,9 +31,9 @@
         <tr class="fixture">
           <td><time datetime="{{.KickoffUTC}}">{{.KickoffUTC}}</time></td>
           <td>
-            {{.HomeTeam}}
+            {{if .HomeFlag}}{{.HomeFlag}} {{end}}{{.HomeTeam}}
             {{if .Score}}<span class="score">{{.Score}}</span>{{else}}<span class="state">vs</span>{{end}}
-            {{.AwayTeam}}
+            {{.AwayTeam}}{{if .AwayFlag}} {{.AwayFlag}}{{end}}
             {{if .StateLabel}}<small class="state">({{.StateLabel}})</small>{{end}}
           </td>
           <td>{{.StageLabel}}</td>
