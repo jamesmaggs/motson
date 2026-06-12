@@ -80,12 +80,14 @@
     .layout { display: flex; gap: 2rem; max-width: 1180px; margin: 0 auto; padding: 1.5rem; align-items: flex-start; }
     .content { flex: 1 1 auto; min-width: 0; }
     .content .intro { margin-top: 0; color: #8d97a3; }
-    /* The sidebar scrolls with the page so the full team list is reachable. */
-    .sidebar { flex: 0 0 200px; }
+    /* The sidebar scrolls with the page so the full team list is reachable.
+       Its background sits between the page (#11151a) and the cards (#1f2730). */
+    .sidebar { flex: 0 0 260px; background: #181e26; border-radius: 12px; padding: .5rem 1.25rem 1rem .75rem; }
+    .sidebar-nav .nav-heading:first-child { margin-top: .5rem; }
     .sidebar-nav .nav-heading { text-transform: uppercase; font-size: .66rem; letter-spacing: .1em; color: #8d97a3; margin: 1.4rem 0 .5rem; }
     .sidebar-nav ul { list-style: none; padding: 0; margin: 0; }
     .sidebar-nav li { margin: .1rem 0; }
-    .sidebar-nav a { display: flex; align-items: center; gap: .5rem; color: #e8e6e3; text-decoration: none; font-size: .85rem; font-weight: 300; padding: .3rem .55rem; border-radius: 8px; }
+    .sidebar-nav a { display: flex; align-items: center; gap: .25rem; color: #e8e6e3; text-decoration: none; font-size: .68rem; font-weight: 300; padding: .25rem .55rem; border-radius: 8px; }
     .sidebar-nav a:hover { background: #1f2730; }
     .sidebar-nav .nav-groups a { font-weight: 400; }
     /* Nudge group names right to line up with the flagged team names. */
