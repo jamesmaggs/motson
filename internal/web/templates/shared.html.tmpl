@@ -71,7 +71,9 @@
     /* Full-width site header above a two-column layout. The mascot is
        sized in rem so it scales with the header's type, and sits flush
        against the bottom border on the right. */
-    .site-header { border-bottom: 1px solid #232a32; }
+    /* Reset Pico's body>header padding-block, which otherwise sits
+       between the content and the border. */
+    .site-header { border-bottom: 1px solid #232a32; padding: 0; }
     .site-header-inner { display: flex; justify-content: space-between; align-items: flex-end; max-width: 1180px; margin: 0 auto; padding: 1.2rem 1.5rem 0; }
     .site-header h1 { margin: 0 0 1.2rem; }
     .site-header .mascot { height: 6rem; width: auto; display: block; }
