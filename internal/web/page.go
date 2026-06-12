@@ -6,10 +6,24 @@ import (
 	"html/template"
 	"log/slog"
 	"net/http"
+	"runtime/debug"
 	"time"
 
 	"github.com/jamesmaggs/motson/internal/fixtures"
 )
+
+// assetVersion fingerprints static asset URLs per build so edge
+// caches cannot serve a previous build's assets after a deploy.
+var assetVersion = func() string {
+	if info, ok := debug.ReadBuildInfo(); ok {
+		for _, kv := range info.Settings {
+			if kv.Key == "vcs.revision" && len(kv.Value) >= 12 {
+				return kv.Value[:12]
+			}
+		}
+	}
+	return fmt.Sprintf("dev%d", time.Now().Unix())
+}()
 
 //go:embed templates/index.html.tmpl
 var templateFS embed.FS
@@ -24,6 +38,7 @@ type pageData struct {
 	LastSyncedUTC string
 	FeedHost      string
 	HasVenues     bool
+	AssetVersion  string
 }
 
 type matchView struct {
@@ -57,7 +72,7 @@ func page(store fixtures.Store, host string) http.HandlerFunc {
 			return
 		}
 
-		data := pageData{Matches: make([]matchView, len(matches)), FeedHost: host}
+		data := pageData{Matches: make([]matchView, len(matches)), FeedHost: host, AssetVersion: assetVersion}
 		if state.LastSyncedAt != nil {
 			data.LastSyncedUTC = state.LastSyncedAt.UTC().Format(time.RFC3339)
 		}

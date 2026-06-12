@@ -99,6 +99,19 @@ func TestVenueColumnShownWhenVenuesAvailable(t *testing.T) {
 	}
 }
 
+// Static asset URLs carry a per-build version so edge caches (e.g.
+// Cloudflare ahead of the custom domain) can't serve a previous
+// build's CSS or fonts after a deploy.
+func TestStaticAssetLinksAreBuildVersioned(t *testing.T) {
+	body := get(t, seeded(t, match("wc-1")), now, "/").Body.String()
+
+	for _, asset := range []string{"pico.min.css?v=", "fonts.css?v="} {
+		if !strings.Contains(body, asset) {
+			t.Errorf("asset link missing build version: want %q in page", asset)
+		}
+	}
+}
+
 // Guarantee: UndeterminedFixtures — an unnamed side renders as "TBC"
 // with no flag.
 func TestUnnamedTeamsRenderAsTBC(t *testing.T) {
