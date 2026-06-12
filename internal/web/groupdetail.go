@@ -6,9 +6,25 @@ import (
 	"github.com/jamesmaggs/motson/internal/fixtures"
 )
 
+type standingRow struct {
+	fixtures.GroupStanding
+	URL string
+}
+
+// standingRows computes a group's standings with team-page links
+// (TeamNamesLink guarantee).
+func standingRows(groupMatches []fixtures.Match) []standingRow {
+	standings := fixtures.Standings(groupMatches)
+	rows := make([]standingRow, len(standings))
+	for i, s := range standings {
+		rows[i] = standingRow{GroupStanding: s, URL: teamURL(s.Team)}
+	}
+	return rows
+}
+
 type groupDetailData struct {
 	GroupName     string
-	Standings     []fixtures.GroupStanding
+	Standings     []standingRow
 	Matches       []matchView
 	LastSyncedUTC string
 	AssetVersion  string
@@ -46,7 +62,7 @@ func groupDetail(store fixtures.Store) http.HandlerFunc {
 
 		data := groupDetailData{
 			GroupName:     groupName,
-			Standings:     fixtures.Standings(group),
+			Standings:     standingRows(group),
 			AssetVersion:  assetVersion,
 			LastSyncedUTC: lastSynced(state),
 		}

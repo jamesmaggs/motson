@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+{{template "head" .}}
+<body>
+  <main class="container">
+    <header>
+      <h1>⚽ World Cup 2026</h1>
+      <p>
+        Every team in the tournament, updated hourly.
+        <a href="/">All fixtures</a> · <a href="/groups">All groups</a>.
+      </p>
+    </header>
+    <ul class="teams">
+      {{range .Teams}}
+      <li><a href="{{.URL}}">{{if .Flag}}{{.Flag}} {{end}}{{.Name}}</a></li>
+      {{end}}
+    </ul>
+{{template "footer" .}}
+</body>
+</html>

@@ -64,7 +64,7 @@ func TestGroupsAreOrderedAndMatchesKeepKickoffOrder(t *testing.T) {
 func TestGroupsViewSharesFixtureTreatment(t *testing.T) {
 	body := get(t, groupStageSpread(t), now, "/groups").Body.String()
 
-	if !strings.Contains(body, "Canada 🇨🇦") || !strings.Contains(body, "🇲🇽 Mexico") {
+	if !strings.Contains(body, `Canada</a> 🇨🇦`) || !strings.Contains(body, `🇲🇽 <a`) {
 		t.Errorf("flag treatment missing on groups view: %s", body)
 	}
 	if got := strings.Count(body, `<td class="score">`); got != 3 {

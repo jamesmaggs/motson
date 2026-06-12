@@ -11,26 +11,7 @@
       </p>
     </header>
     <h2>{{.GroupName}}</h2>
-    <table>
-      <thead>
-        <tr><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th></tr>
-      </thead>
-      <tbody>
-        {{range .Standings}}
-        <tr>
-          <td>{{.Team}}</td>
-          <td>{{.Played}}</td>
-          <td>{{.Won}}</td>
-          <td>{{.Drawn}}</td>
-          <td>{{.Lost}}</td>
-          <td>{{.GoalsFor}}</td>
-          <td>{{.GoalsAgainst}}</td>
-          <td>{{.GoalDifference}}</td>
-          <td class="points">{{.Points}}</td>
-        </tr>
-        {{end}}
-      </tbody>
-    </table>
+{{template "standingsTable" .Standings}}
     <table class="fixtures">
       <colgroup><col class="c-kick"><col class="c-side"><col class="c-score"><col class="c-side">{{if $.HasVenues}}<col>{{end}}</colgroup>
       <thead>

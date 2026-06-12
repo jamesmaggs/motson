@@ -267,6 +267,10 @@ surface FixturesPage {
         -- placeholders such as "Winner Group A") render without a
         -- flag rather than with a wrong or broken one.
 
+    @guarantee TeamNamesLink
+        -- Every named team's name links to its TeamDetailPage;
+        -- unnamed (TBC) sides do not link.
+
     @guidance
         -- Present matches in kickoff order; grouping by stage or by
         -- day is a presentation choice left to implementation. Scores
@@ -305,6 +309,9 @@ surface GroupFixturesPage {
     @guarantee TeamFlags
         -- Same reading order as FixturesPage: home name, home flag,
         -- score, away flag, away name.
+
+    @guarantee TeamNamesLink
+        -- Every named team's name links to its TeamDetailPage.
 
     @guidance
         -- Groups are ordered alphabetically (Group A through Group
@@ -352,6 +359,10 @@ surface GroupDetailPage {
         -- Same reading order as FixturesPage in the fixtures list:
         -- home name, home flag, score, away flag, away name.
 
+    @guarantee TeamNamesLink
+        -- Team names in the standings and the fixtures list link to
+        -- each team's TeamDetailPage.
+
     @guidance
         -- Reached from the stage entries of FixturesPage (each
         -- "Group X" stage label links to its group's page) and
@@ -360,6 +371,65 @@ surface GroupDetailPage {
     related:
         FixturesPage(schedule)
         GroupFixturesPage(schedule)
+}
+
+surface TeamsPage {
+    context schedule: SyncSchedule
+
+    exposes:
+        schedule.last_synced_at
+        for match in Matches:
+            match.home_team
+            match.away_team
+
+    @guarantee TeamDirectory
+        -- Every named team appearing in any fixture is listed exactly
+        -- once, alphabetically, with its flag, linking to its
+        -- TeamDetailPage. Unnamed sides do not appear.
+
+    @guarantee PublicAccess
+        -- The page requires no authentication.
+
+    related:
+        FixturesPage(schedule)
+}
+
+surface TeamDetailPage {
+    context schedule: SyncSchedule
+
+    exposes:
+        schedule.last_synced_at
+        GroupStanding
+        for match in Matches:
+            match.home_team
+            match.away_team
+            match.kickoff_at
+            match.stage
+            match.venue when match.venue != null
+            match.provider_status
+            match.home_score when match.provider_status = finished
+            match.away_score when match.provider_status = finished
+
+    @guarantee OnePagePerTeam
+        -- One instance of this surface exists per named team,
+        -- addressed by a slug of the team's name (lowercased, spaces
+        -- replaced with hyphens, e.g. "South Korea" -> south-korea).
+        -- The instance shows the team's name with its flag, the
+        -- team's group standings table, and every fixture the team
+        -- appears in across all stages, in kickoff order. Unknown
+        -- slugs are refused as not found.
+
+    @guarantee TeamNavigation
+        -- The page links to the team's GroupDetailPage and to every
+        -- other team's TeamDetailPage.
+
+    @guarantee PublicAccess
+        -- The page requires no authentication.
+
+    related:
+        GroupDetailPage(schedule)
+        TeamsPage(schedule)
+        FixturesPage(schedule)
 }
 
 surface HealthCheck {

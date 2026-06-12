@@ -16,6 +16,15 @@
     h2 { color: #fff; font-family: "Bebas Neue", Inter, sans-serif; font-weight: 400; font-size: 1.6rem; letter-spacing: .06em; margin: 2.5rem 0 0; }
     table { --pico-background-color: transparent; font-size: .85em; margin-top: 2.5rem; margin-bottom: 2.5rem; }
     h2 + table { margin-top: .75rem; }
+    h3 { color: #8d97a3; font-family: "Bebas Neue", Inter, sans-serif; font-weight: 400; font-size: 1.1rem; letter-spacing: .08em; margin: 2rem 0 0; }
+    h3 + table { margin-top: .75rem; }
+    h3 a { color: inherit; text-decoration: none; }
+    h3 a:hover { text-decoration: underline; }
+    ul.teams { list-style: none; padding: 0; margin: 2.5rem 0; columns: 3; }
+    ul.teams li { margin: .4rem 0; }
+    ul.teams a, p.teams a { color: inherit; text-decoration: none; }
+    ul.teams a:hover, p.teams a:hover { text-decoration: underline; }
+    p.teams { line-height: 2; }
     table.fixtures { table-layout: fixed; }
     col.c-kick { width: 24%; }
     col.c-side { width: 31%; }
@@ -40,12 +49,35 @@
 {{end}}
 
 {{define "matchCells"}}
-          <td class="home">{{.HomeTeam}}{{if .HomeFlag}} {{.HomeFlag}}{{end}}</td>
+          <td class="home">{{if .HomeURL}}<a href="{{.HomeURL}}">{{.HomeTeam}}</a>{{else}}{{.HomeTeam}}{{end}}{{if .HomeFlag}} {{.HomeFlag}}{{end}}</td>
           <td class="score">
             {{if .Score}}{{.Score}}{{else}}<span class="state">vs</span>{{end}}
             {{if .StateLabel}}<br><small class="state">{{.StateLabel}}</small>{{end}}
           </td>
-          <td class="away">{{if .AwayFlag}}{{.AwayFlag}} {{end}}{{.AwayTeam}}</td>
+          <td class="away">{{if .AwayFlag}}{{.AwayFlag}} {{end}}{{if .AwayURL}}<a href="{{.AwayURL}}">{{.AwayTeam}}</a>{{else}}{{.AwayTeam}}{{end}}</td>
+{{end}}
+
+{{define "standingsTable"}}
+    <table>
+      <thead>
+        <tr><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th></tr>
+      </thead>
+      <tbody>
+        {{range .}}
+        <tr>
+          <td>{{if .URL}}<a href="{{.URL}}">{{.Team}}</a>{{else}}{{.Team}}{{end}}</td>
+          <td>{{.Played}}</td>
+          <td>{{.Won}}</td>
+          <td>{{.Drawn}}</td>
+          <td>{{.Lost}}</td>
+          <td>{{.GoalsFor}}</td>
+          <td>{{.GoalsAgainst}}</td>
+          <td>{{.GoalDifference}}</td>
+          <td class="points">{{.Points}}</td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
 {{end}}
 
 {{define "footer"}}

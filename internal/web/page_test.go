@@ -149,10 +149,10 @@ func TestUnnamedTeamsRenderAsTBC(t *testing.T) {
 func TestPageShowsFlagsHuggingTheScore(t *testing.T) {
 	body := get(t, seeded(t, match("wc-1")), now, "/").Body.String()
 
-	if !strings.Contains(body, "Canada 🇨🇦") {
+	if !strings.Contains(body, `<a href="/teams/canada">Canada</a> 🇨🇦`) {
 		t.Errorf("home flag missing after home team name: %s", body)
 	}
-	if !strings.Contains(body, "🇲🇽 Mexico") {
+	if !strings.Contains(body, `🇲🇽 <a href="/teams/mexico">Mexico</a>`) {
 		t.Errorf("away flag missing before away team name: %s", body)
 	}
 }
