@@ -2,16 +2,14 @@
 <html lang="en">
 {{template "head" .}}
 <body>
+  {{template "siteheader"}}
   <div class="layout">
     {{template "sidebar" .Nav}}
     <main class="content">
-    <header>
-      <h1>⚽ World Cup 2026</h1>
-      <p>
+      <p class="intro">
         {{.TeamName}}'s group, results and fixtures, updated hourly.
         <a href="/">All fixtures</a>.
       </p>
-    </header>
     <h2>{{if .Flag}}{{.Flag}} {{end}}{{.TeamName}}</h2>
     {{if .Standings}}
     <h3>{{if .GroupURL}}<a href="{{.GroupURL}}">{{.GroupName}}</a>{{else}}{{.GroupName}}{{end}}</h3>

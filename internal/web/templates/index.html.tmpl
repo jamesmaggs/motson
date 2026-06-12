@@ -2,17 +2,15 @@
 <html lang="en">
 {{template "head" .}}
 <body>
+  {{template "siteheader"}}
   <div class="layout">
     {{template "sidebar" .Nav}}
     <main class="content">
-    <header>
-      <h1>⚽ World Cup 2026</h1>
-      <p>
+      <p class="intro">
         Fixtures and scores, updated hourly.
         <a href="webcal://{{.FeedHost}}/calendar.ics">Subscribe in your calendar</a>
         to get scores as events update.
       </p>
-    </header>
     <div class="cards">
       {{range .Matches}}
       <article class="card">

@@ -68,10 +68,15 @@
     .venue { text-align: center; color: #79838e; font-size: .72rem; margin-top: .9rem; }
     .status { text-align: center; color: #79838e; font-size: .72rem; margin-top: .9rem; }
 
-    /* Two-column layout with a sticky left navbar */
+    /* Full-width site header above a two-column layout */
+    .site-header { border-bottom: 1px solid #232a32; }
+    .site-header-inner { max-width: 1180px; margin: 0 auto; padding: 1.2rem 1.5rem; }
+    .site-header h1 { margin: 0; }
     .layout { display: flex; gap: 2rem; max-width: 1180px; margin: 0 auto; padding: 1.5rem; align-items: flex-start; }
     .content { flex: 1 1 auto; min-width: 0; }
-    .sidebar { flex: 0 0 200px; position: sticky; top: 1.5rem; }
+    .content .intro { margin-top: 0; color: #8d97a3; }
+    /* The sidebar scrolls with the page so the full team list is reachable. */
+    .sidebar { flex: 0 0 200px; }
     .sidebar-nav .nav-heading { text-transform: uppercase; font-size: .66rem; letter-spacing: .1em; color: #8d97a3; margin: 1.4rem 0 .5rem; }
     .sidebar-nav ul { list-style: none; padding: 0; margin: 0; }
     .sidebar-nav li { margin: .1rem 0; }
@@ -86,6 +91,12 @@
     }
   </style>
 </head>
+{{end}}
+
+{{define "siteheader"}}
+  <header class="site-header">
+    <div class="site-header-inner"><h1>⚽ World Cup 2026</h1></div>
+  </header>
 {{end}}
 
 {{define "sidebar"}}
