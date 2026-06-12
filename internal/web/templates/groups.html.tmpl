@@ -6,26 +6,27 @@
     <header>
       <h1>⚽ World Cup 2026</h1>
       <p>
-        Fixtures and scores, updated hourly.
-        <a href="webcal://{{.FeedHost}}/calendar.ics">Subscribe in your calendar</a>
-        to get scores as events update, or <a href="/groups">browse by group</a>.
+        Group-stage fixtures by group, updated hourly.
+        <a href="/">All fixtures</a>.
       </p>
     </header>
+    {{range .Groups}}
+    <h2>{{.Name}}</h2>
     <table>
       <thead>
-        <tr><th>Kick-off</th><th colspan="3" class="match">Match</th><th>Stage</th>{{if .HasVenues}}<th>Venue</th>{{end}}</tr>
+        <tr><th>Kick-off</th><th colspan="3" class="match">Match</th>{{if $.HasVenues}}<th>Venue</th>{{end}}</tr>
       </thead>
       <tbody>
         {{range .Matches}}
         <tr class="fixture">
           <td><time datetime="{{.KickoffUTC}}">{{.KickoffUTC}}</time></td>
           {{template "matchCells" .}}
-          <td>{{.StageLabel}}</td>
           {{if $.HasVenues}}<td>{{.Venue}}</td>{{end}}
         </tr>
         {{end}}
       </tbody>
     </table>
+    {{end}}
 {{template "footer" .}}
 </body>
 </html>

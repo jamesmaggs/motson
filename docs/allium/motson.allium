@@ -257,6 +257,46 @@ surface FixturesPage {
         -- Present matches in kickoff order; grouping by stage or by
         -- day is a presentation choice left to implementation. Scores
         -- align vertically down the page so results are scannable.
+
+    related:
+        GroupFixturesPage(schedule)
+}
+
+surface GroupFixturesPage {
+    context schedule: SyncSchedule
+
+    exposes:
+        schedule.last_synced_at
+        for match in Matches where stage = group:
+            match.group_name
+            match.home_team
+            match.away_team
+            match.kickoff_at
+            match.venue when match.venue != null
+            match.provider_status
+            match.home_score when match.provider_status = finished
+            match.away_score when match.provider_status = finished
+
+    @guarantee GroupStageOnly
+        -- Only group-stage matches appear on this view; knockout
+        -- fixtures are absent. Matches are organised into one
+        -- section per group.
+
+    @guarantee PublicAccess
+        -- The page requires no authentication.
+
+    @guarantee TeamFlags
+        -- Same reading order as FixturesPage: home name, home flag,
+        -- score, away flag, away name.
+
+    @guidance
+        -- Groups are ordered alphabetically (Group A through Group
+        -- L); within a group, matches are in kickoff order. The view
+        -- shares FixturesPage's visual treatment, dropping the stage
+        -- column that grouping makes redundant.
+
+    related:
+        FixturesPage(schedule)
 }
 
 surface HealthCheck {

@@ -1,0 +1,65 @@
+{{define "head"}}
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Motson — World Cup 2026 fixtures</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>">
+  <link rel="stylesheet" href="/static/pico.min.css?v={{.AssetVersion}}">
+  <link rel="stylesheet" href="/static/fonts.css?v={{.AssetVersion}}">
+  <link rel="alternate" type="text/calendar" title="World Cup 2026 calendar" href="/calendar.ics">
+  <style>
+    /* Floodlit scoreboard: dark night-match chrome, amber scores,
+       Bebas Neue title over Inter data. */
+    body { background: #11151a; color: #e8e6e3; font-family: Inter, -apple-system, system-ui, sans-serif; }
+    main h1, main h2, main p, main th, main td, footer p { color: #e8e6e3; }
+    h1 { color: #fff; font-family: "Bebas Neue", Inter, sans-serif; font-weight: 400; font-size: 3rem; letter-spacing: .06em; }
+    h2 { color: #fff; font-family: "Bebas Neue", Inter, sans-serif; font-weight: 400; font-size: 1.6rem; letter-spacing: .06em; margin: 2.5rem 0 0; }
+    table { --pico-background-color: transparent; font-size: .85em; margin-top: 2.5rem; margin-bottom: 2.5rem; }
+    h2 + table { margin-top: .75rem; }
+    tbody td { font-weight: 300; }
+    thead th { color: #8d97a3; border-bottom: 2px solid #2a313a; text-transform: uppercase; font-size: .8em; letter-spacing: .08em; }
+    thead th.match { text-align: center; }
+    tbody td { border-color: #232a32; }
+    tbody tr:hover { background: #171c22; }
+    a { color: #ffd23f; }
+    .fixture td:first-child { white-space: nowrap; }
+    td.home { text-align: right; }
+    td.score { text-align: center; font-weight: 700; font-size: 1.15em; white-space: nowrap; color: #ffd23f; font-variant-numeric: tabular-nums; text-shadow: 0 0 12px rgba(255, 210, 63, .35); }
+    td.away { text-align: left; }
+    .state { color: #79838e; font-weight: 400; text-shadow: none; }
+    td.score .state { font-size: .7em; }
+    footer p { font-size: .75em; }
+  </style>
+</head>
+{{end}}
+
+{{define "matchCells"}}
+          <td class="home">{{.HomeTeam}}{{if .HomeFlag}} {{.HomeFlag}}{{end}}</td>
+          <td class="score">
+            {{if .Score}}{{.Score}}{{else}}<span class="state">vs</span>{{end}}
+            {{if .StateLabel}}<br><small class="state">{{.StateLabel}}</small>{{end}}
+          </td>
+          <td class="away">{{if .AwayFlag}}{{.AwayFlag}} {{end}}{{.AwayTeam}}</td>
+{{end}}
+
+{{define "footer"}}
+    <footer>
+      <p class="state">
+        Last updated
+        {{if .LastSyncedUTC}}<time datetime="{{.LastSyncedUTC}}">{{.LastSyncedUTC}}</time>{{else}}never{{end}}.
+        Times shown in your local timezone.
+      </p>
+    </footer>
+  </main>
+  <script>
+    for (const el of document.querySelectorAll("time[datetime]")) {
+      const d = new Date(el.getAttribute("datetime"));
+      if (!isNaN(d)) {
+        el.textContent = d.toLocaleString(undefined, {
+          weekday: "short", day: "numeric", month: "short",
+          hour: "2-digit", minute: "2-digit"
+        });
+      }
+    }
+  </script>
+{{end}}

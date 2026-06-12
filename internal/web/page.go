@@ -25,13 +25,13 @@ var assetVersion = func() string {
 	return fmt.Sprintf("dev%d", time.Now().Unix())
 }()
 
-//go:embed templates/index.html.tmpl
+//go:embed templates
 var templateFS embed.FS
 
 //go:embed static
 var staticFS embed.FS
 
-var indexTemplate = template.Must(template.ParseFS(templateFS, "templates/index.html.tmpl"))
+var templates = template.Must(template.ParseFS(templateFS, "templates/*.tmpl"))
 
 type pageData struct {
 	Matches       []matchView
@@ -72,21 +72,36 @@ func page(store fixtures.Store, host string) http.HandlerFunc {
 			return
 		}
 
-		data := pageData{Matches: make([]matchView, len(matches)), FeedHost: host, AssetVersion: assetVersion}
-		if state.LastSyncedAt != nil {
-			data.LastSyncedUTC = state.LastSyncedAt.UTC().Format(time.RFC3339)
-		}
-		for i, m := range matches {
-			data.Matches[i] = viewOf(m)
-			if m.Venue != "" {
-				data.HasVenues = true
-			}
-		}
+		data := pageData{FeedHost: host, AssetVersion: assetVersion, LastSyncedUTC: lastSynced(state)}
+		data.Matches, data.HasVenues = buildViews(matches)
 
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		if err := indexTemplate.Execute(w, data); err != nil {
-			slog.Error("rendering page", "error", err)
+		render(w, "index.html.tmpl", data)
+	}
+}
+
+func lastSynced(state fixtures.SyncState) string {
+	if state.LastSyncedAt == nil {
+		return ""
+	}
+	return state.LastSyncedAt.UTC().Format(time.RFC3339)
+}
+
+func buildViews(matches []fixtures.Match) ([]matchView, bool) {
+	views := make([]matchView, len(matches))
+	hasVenues := false
+	for i, m := range matches {
+		views[i] = viewOf(m)
+		if m.Venue != "" {
+			hasVenues = true
 		}
+	}
+	return views, hasVenues
+}
+
+func render(w http.ResponseWriter, name string, data any) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	if err := templates.ExecuteTemplate(w, name, data); err != nil {
+		slog.Error("rendering page", "template", name, "error", err)
 	}
 }
 
