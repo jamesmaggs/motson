@@ -25,7 +25,7 @@ func TestSidebarListsGroupsAndTeams(t *testing.T) {
 			t.Errorf("%s: sidebar missing", path)
 			continue
 		}
-		if !strings.Contains(body, `<ul class="nav-groups">`) || !strings.Contains(body, `<a href="/groups/A">Group A</a>`) {
+		if !strings.Contains(body, `<ul class="nav-groups">`) || !strings.Contains(body, `<a href="/groups/A"><span class="flag"></span>Group A</a>`) {
 			t.Errorf("%s: group links missing from sidebar", path)
 		}
 		if !strings.Contains(body, `<ul class="nav-teams">`) ||

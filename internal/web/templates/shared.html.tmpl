@@ -88,7 +88,11 @@
     .sidebar-nav a { display: flex; align-items: center; gap: .5rem; color: #e8e6e3; text-decoration: none; font-size: .85rem; font-weight: 300; padding: .3rem .55rem; border-radius: 8px; }
     .sidebar-nav a:hover { background: #1f2730; }
     .sidebar-nav .nav-groups a { font-weight: 400; }
-    .sidebar .flag { font-size: 1.15rem; line-height: 1; }
+    /* Nudge group names right to line up with the flagged team names. */
+    .sidebar-nav .nav-groups .flag { flex-basis: 2.1rem; }
+    /* Fixed-width flag box so group names (whose flag slot is empty)
+       line up with team names. */
+    .sidebar .flag { font-size: 1.15rem; line-height: 1; text-align: center; flex: 0 0 1.8rem; min-width: 0; }
     @media (max-width: 720px) {
       .layout { flex-direction: column; padding: 1rem; }
       .sidebar { position: static; flex-basis: auto; width: 100%; }
@@ -112,7 +116,7 @@
       <nav class="sidebar-nav">
         <p class="nav-heading">Groups</p>
         <ul class="nav-groups">
-          {{range .Groups}}<li><a href="{{.URL}}">{{.Name}}</a></li>{{end}}
+          {{range .Groups}}<li><a href="{{.URL}}"><span class="flag"></span>{{.Name}}</a></li>{{end}}
         </ul>
         <p class="nav-heading">Teams</p>
         <ul class="nav-teams">
