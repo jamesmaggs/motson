@@ -62,6 +62,7 @@ type matchView struct {
 	AwayGoals   string // card score: away goals
 	Pens        string // "4–2 pens" for a finished shootout, else empty
 	StatusLabel string // "In play", "Postponed", "Cancelled" or empty
+	Live        bool   // match in progress — cards glow instead of labelling
 }
 
 var stateLabels = map[fixtures.Status]string{
@@ -136,6 +137,7 @@ func viewOf(m fixtures.Match) matchView {
 		StageLabel:  m.GroupName,
 		StageName:   m.Stage.Label(),
 		StatusLabel: stateLabels[m.Status],
+		Live:        m.Status == fixtures.StatusInPlay,
 	}
 	if m.Stage != fixtures.StageGroup {
 		v.StageLabel = m.Stage.Label()

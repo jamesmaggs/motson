@@ -13,7 +13,7 @@
       </p>
     <div class="cards">
       {{range .Matches}}
-      <article class="card">
+      <article class="card{{if .Live}} live{{end}}">
         <div class="card-top">
           <div class="meta">
             <span class="stage">{{.StageName}}</span>
@@ -33,7 +33,7 @@
           </div>
         </div>
         {{if .Venue}}<div class="venue">{{.Venue}}</div>{{end}}
-        {{if .StatusLabel}}<div class="status">{{.StatusLabel}}</div>{{end}}
+        {{if and .StatusLabel (not .Live)}}<div class="status">{{.StatusLabel}}</div>{{end}}
       </article>
       {{end}}
     </div>

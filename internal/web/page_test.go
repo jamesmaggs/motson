@@ -55,8 +55,24 @@ func TestPageShowsScoreOnlyWhenFinished(t *testing.T) {
 	if got := strings.Count(body, `class="score"`); got != 1 {
 		t.Errorf("got %d score blocks, want 1 (only the finished match)", got)
 	}
-	if !strings.Contains(body, "In play") {
-		t.Errorf("in-play match should be labelled, page: %s", body)
+}
+
+// In-progress matches are signalled by a green glow on the card (the
+// "live" class), not by an "In play" label.
+func TestInProgressCardGlowsAndDropsLabel(t *testing.T) {
+	inPlay := match("wc-1")
+	inPlay.Status = fixtures.StatusInPlay
+
+	body := get(t, seeded(t, inPlay), now, "/").Body.String()
+
+	if !strings.Contains(body, `class="card live"`) {
+		t.Errorf("in-play card not marked live: %s", body)
+	}
+	if strings.Contains(body, "In play") {
+		t.Errorf("in-play card should not carry an 'In play' label")
+	}
+	if !strings.Contains(body, ".card.live") {
+		t.Errorf("stylesheet missing the live-card glow rule")
 	}
 }
 

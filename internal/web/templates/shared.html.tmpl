@@ -49,6 +49,8 @@
     /* Match cards (index) */
     .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); grid-auto-rows: 1fr; gap: 1rem; margin: 2.5rem 0; }
     .card { background: #1f2730; border: 1px solid #2a333d; border-radius: 16px; padding: 1.1rem 1.2rem 1.3rem; box-shadow: none; margin: 0; }
+    /* In-progress matches glow green (group-pill tone). */
+    .card.live { border-color: rgba(47,191,113,.45); box-shadow: 0 0 14px rgba(47,191,113,.22); }
     .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: .5rem; margin-bottom: 1rem; }
     .meta { display: flex; flex-direction: column; gap: .25rem; }
     .stage { text-transform: uppercase; font-size: .62rem; letter-spacing: .1em; color: #8d97a3; }

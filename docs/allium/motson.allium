@@ -276,7 +276,8 @@ surface FixturesPage {
         -- GroupDetailPage) top-right, and the score — or "vs" before
         -- kick-off — flanked by each team's flag and name. Knockout
         -- cards carry no group. Venue, when present, sits with the
-        -- score.
+        -- score. An in-progress match's card is distinguished
+        -- visually (in place of an explicit status label).
 
     related:
         GroupDetailPage(schedule)
