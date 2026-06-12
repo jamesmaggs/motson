@@ -3,7 +3,10 @@
 // docs/allium/motson.allium.
 package fixtures
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 // Config defaults from the spec's config block.
 const (
@@ -53,6 +56,17 @@ type Match struct {
 	// Penalties are present only for finished matches decided by a shootout.
 	HomePenalties *int
 	AwayPenalties *int
+}
+
+// Validate enforces the spec's NonNegativeScores invariant: a finished
+// match cannot carry a negative score.
+func (m Match) Validate() error {
+	for _, score := range []*int{m.HomeScore, m.AwayScore} {
+		if score != nil && *score < 0 {
+			return fmt.Errorf("match %s: negative score violates NonNegativeScores", m.ProviderMatchID)
+		}
+	}
+	return nil
 }
 
 // EndsAt is the calendar event end time: kickoff plus the configured

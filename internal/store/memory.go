@@ -23,6 +23,11 @@ func NewMemory() *Memory {
 }
 
 func (m *Memory) ReplaceAll(_ context.Context, matches []fixtures.Match, syncedAt time.Time) error {
+	for _, match := range matches {
+		if err := match.Validate(); err != nil {
+			return err
+		}
+	}
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.matches = make(map[string]fixtures.Match, len(matches))

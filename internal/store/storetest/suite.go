@@ -139,6 +139,40 @@ func Run(t *testing.T, newStore func(t *testing.T) fixtures.Store) {
 		assertMatchEqual(t, matches[0], m)
 	})
 
+	// Obligation: invariant.NonNegativeScores — a snapshot carrying a
+	// negative score is rejected whole, leaving the store unchanged
+	// (the invariant holds after every state change; StalenessTolerated
+	// covers serving the previous data).
+	t.Run("snapshot with a negative score is rejected whole", func(t *testing.T) {
+		s := newStore(t)
+		good := sampleMatch("wc-1")
+		if err := s.ReplaceAll(ctx, []fixtures.Match{good}, syncedAt); err != nil {
+			t.Fatal(err)
+		}
+
+		bad := sampleMatch("wc-2")
+		bad.Status = fixtures.StatusFinished
+		bad.HomeScore, bad.AwayScore = intp(-1), intp(2)
+		if err := s.ReplaceAll(ctx, []fixtures.Match{good, bad}, syncedAt.Add(time.Hour)); err == nil {
+			t.Fatal("want error for negative score")
+		}
+
+		matches, err := s.Matches(ctx)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(matches) != 1 || matches[0].ProviderMatchID != "wc-1" {
+			t.Errorf("store changed by rejected snapshot: %v", ids(matches))
+		}
+		state, err := s.SyncState(ctx)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if state.LastSyncedAt == nil || !state.LastSyncedAt.Equal(syncedAt) {
+			t.Errorf("LastSyncedAt = %v, want unchanged %v", state.LastSyncedAt, syncedAt)
+		}
+	})
+
 	// Obligation: rule-success.VanishedMatchesRemoved — matches absent
 	// from a snapshot are removed.
 	t.Run("snapshot removes vanished matches", func(t *testing.T) {

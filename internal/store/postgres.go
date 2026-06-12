@@ -23,8 +23,8 @@ CREATE TABLE IF NOT EXISTS matches (
     stage             text NOT NULL,
     group_name        text NOT NULL DEFAULT '',
     status            text NOT NULL,
-    home_score        int,
-    away_score        int,
+    home_score        int CHECK (home_score >= 0),
+    away_score        int CHECK (away_score >= 0),
     home_penalties    int,
     away_penalties    int
 );
@@ -65,6 +65,11 @@ func (p *Postgres) Reset(ctx context.Context) error {
 }
 
 func (p *Postgres) ReplaceAll(ctx context.Context, matches []fixtures.Match, syncedAt time.Time) error {
+	for _, m := range matches {
+		if err := m.Validate(); err != nil {
+			return err
+		}
+	}
 	tx, err := p.pool.Begin(ctx)
 	if err != nil {
 		return err
