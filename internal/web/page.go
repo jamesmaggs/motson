@@ -22,6 +22,7 @@ var indexTemplate = template.Must(template.ParseFS(templateFS, "templates/index.
 type pageData struct {
 	Matches       []matchView
 	LastSyncedUTC string
+	FeedHost      string
 }
 
 type matchView struct {
@@ -49,7 +50,7 @@ var stateLabels = map[fixtures.Status]string{
 	fixtures.StatusCancelled: "Cancelled",
 }
 
-func page(store fixtures.Store) http.HandlerFunc {
+func page(store fixtures.Store, host string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		matches, err := store.Matches(r.Context())
 		if err != nil {
@@ -62,7 +63,7 @@ func page(store fixtures.Store) http.HandlerFunc {
 			return
 		}
 
-		data := pageData{Matches: make([]matchView, len(matches))}
+		data := pageData{Matches: make([]matchView, len(matches)), FeedHost: host}
 		if state.LastSyncedAt != nil {
 			data.LastSyncedUTC = state.LastSyncedAt.UTC().Format(time.RFC3339)
 		}

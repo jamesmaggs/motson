@@ -80,6 +80,15 @@ func TestPageShowsLastSyncedTime(t *testing.T) {
 	}
 }
 
+// The subscribe link must use the webcal scheme so calendar clients
+// subscribe (and auto-update) rather than import a one-off copy.
+func TestPageSubscribeLinkUsesWebcalScheme(t *testing.T) {
+	body := get(t, seeded(t, match("wc-1")), now, "/").Body.String()
+	if !strings.Contains(body, `href="webcal://motson.jamesmaggs.com/calendar.ics"`) {
+		t.Errorf("page missing webcal subscribe link: %s", body)
+	}
+}
+
 func TestPageMarksCancelledAndPostponedMatches(t *testing.T) {
 	cancelled := match("wc-1")
 	cancelled.Status = fixtures.StatusCancelled

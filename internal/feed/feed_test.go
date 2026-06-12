@@ -186,6 +186,20 @@ func TestEventDescriptionExposesStatus(t *testing.T) {
 	}
 }
 
+// Subscribed clients should re-poll hourly, matching sync_interval.
+func TestFeedAdvertisesHourlyRefresh(t *testing.T) {
+	out, err := feed.Render(host, []fixtures.Match{scheduled()})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(out, "REFRESH-INTERVAL;VALUE=DURATION:PT1H") {
+		t.Error("feed missing REFRESH-INTERVAL:PT1H")
+	}
+	if !strings.Contains(out, "X-PUBLISHED-TTL:PT1H") {
+		t.Error("feed missing X-PUBLISHED-TTL:PT1H")
+	}
+}
+
 func TestFeedRendersOneEventPerMatch(t *testing.T) {
 	a, b := scheduled(), scheduled()
 	b.ProviderMatchID = "wc-2"

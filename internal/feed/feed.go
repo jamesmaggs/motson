@@ -17,8 +17,11 @@ import (
 func Render(host string, matches []fixtures.Match) (string, error) {
 	cal := ics.NewCalendar()
 	cal.SetProductId("-//Motson//World Cup 2026//EN")
-	cal.SetMethod(ics.MethodPublish)
 	cal.SetName("World Cup 2026")
+	// Subscribed clients re-poll on this hint, matching sync_interval.
+	refresh := fmt.Sprintf("PT%dH", int(fixtures.SyncInterval.Hours()))
+	cal.SetRefreshInterval(refresh)
+	cal.SetXPublishedTTL(refresh)
 
 	for _, m := range matches {
 		e := cal.AddEvent(fmt.Sprintf("%s@%s", m.ProviderMatchID, host))
