@@ -1,0 +1,8 @@
+# System Files
+.DS_Store
+
+# IDE files
+.idea
+
+# Claude
+.claude/settings.local.json
