@@ -39,7 +39,9 @@ value ProviderFixture {
     home_team: String
     away_team: String
     kickoff_at: Timestamp
-    venue: String
+    -- The provider does not reliably supply venues; absent venues are
+    -- tolerated and surfaces omit them gracefully.
+    venue: String?
     stage: group | round_of_32 | round_of_16 | quarter_final | semi_final | third_place | final
     group_name: String?
     status: scheduled | in_play | finished | postponed | cancelled
@@ -67,7 +69,7 @@ entity Match {
     home_team: String
     away_team: String
     kickoff_at: Timestamp
-    venue: String
+    venue: String?
     stage: group | round_of_32 | round_of_16 | quarter_final | semi_final | third_place | final
     group_name: String when stage = group
     -- The lifecycle is owned by the provider; Motson stores the
@@ -180,7 +182,7 @@ surface CalendarFeed {
             match.away_team
             match.kickoff_at
             match.ends_at
-            match.venue
+            match.venue when match.venue != null
             match.stage
             match.provider_status
             match.home_score when match.provider_status = finished
@@ -223,7 +225,7 @@ surface FixturesPage {
             match.home_team
             match.away_team
             match.kickoff_at
-            match.venue
+            match.venue when match.venue != null
             match.provider_status
             match.home_score when match.provider_status = finished
             match.away_score when match.provider_status = finished

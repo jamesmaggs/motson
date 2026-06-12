@@ -23,6 +23,7 @@ type pageData struct {
 	Matches       []matchView
 	LastSyncedUTC string
 	FeedHost      string
+	HasVenues     bool
 }
 
 type matchView struct {
@@ -71,6 +72,9 @@ func page(store fixtures.Store, host string) http.HandlerFunc {
 		}
 		for i, m := range matches {
 			data.Matches[i] = viewOf(m)
+			if m.Venue != "" {
+				data.HasVenues = true
+			}
 		}
 
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")

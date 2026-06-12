@@ -80,6 +80,25 @@ func TestPageShowsLastSyncedTime(t *testing.T) {
 	}
 }
 
+// Spec: venue exposed only when present. The column appears when any
+// match has a venue and disappears entirely when none do.
+func TestVenueColumnOmittedWhenProviderSendsNoVenues(t *testing.T) {
+	noVenue := match("wc-1")
+	noVenue.Venue = ""
+
+	body := get(t, seeded(t, noVenue), now, "/").Body.String()
+	if strings.Contains(body, "Venue") {
+		t.Errorf("venue column shown despite no venue data: %s", body)
+	}
+}
+
+func TestVenueColumnShownWhenVenuesAvailable(t *testing.T) {
+	body := get(t, seeded(t, match("wc-1")), now, "/").Body.String()
+	if !strings.Contains(body, "Venue") || !strings.Contains(body, "Estadio Azteca, Mexico City") {
+		t.Errorf("venue column missing despite venue data: %s", body)
+	}
+}
+
 // Guarantee: TeamFlags — the home team's flag precedes its name, the
 // away team's flag follows its name.
 func TestPageShowsFlagsAroundTeamNames(t *testing.T) {

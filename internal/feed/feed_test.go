@@ -186,6 +186,20 @@ func TestEventDescriptionExposesStatus(t *testing.T) {
 	}
 }
 
+// Spec: venue exposed only when present — an absent venue must not
+// produce an empty LOCATION property.
+func TestNoLocationPropertyWhenVenueAbsent(t *testing.T) {
+	m := scheduled()
+	m.Venue = ""
+	out, err := feed.Render(host, []fixtures.Match{m})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(out, "LOCATION") {
+		t.Errorf("feed emits LOCATION for a match without a venue:\n%s", out)
+	}
+}
+
 // Subscribed clients should re-poll hourly, matching sync_interval.
 func TestFeedAdvertisesHourlyRefresh(t *testing.T) {
 	out, err := feed.Render(host, []fixtures.Match{scheduled()})

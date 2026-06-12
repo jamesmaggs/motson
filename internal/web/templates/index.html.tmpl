@@ -24,7 +24,7 @@
     </header>
     <table>
       <thead>
-        <tr><th>Kick-off</th><th>Match</th><th>Stage</th><th>Venue</th></tr>
+        <tr><th>Kick-off</th><th>Match</th><th>Stage</th>{{if .HasVenues}}<th>Venue</th>{{end}}</tr>
       </thead>
       <tbody>
         {{range .Matches}}
@@ -37,7 +37,7 @@
             {{if .StateLabel}}<small class="state">({{.StateLabel}})</small>{{end}}
           </td>
           <td>{{.StageLabel}}</td>
-          <td>{{.Venue}}</td>
+          {{if $.HasVenues}}<td>{{.Venue}}</td>{{end}}
         </tr>
         {{end}}
       </tbody>

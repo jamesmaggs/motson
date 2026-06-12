@@ -28,7 +28,9 @@ func Render(host string, matches []fixtures.Match) (string, error) {
 		e.SetSummary(summary(m))
 		e.SetStartAt(m.KickoffAt.UTC())
 		e.SetEndAt(m.EndsAt().UTC())
-		e.SetLocation(m.Venue)
+		if m.Venue != "" {
+			e.SetLocation(m.Venue)
+		}
 		e.SetStatus(eventStatus(m.Status))
 		e.SetDescription(statusLabels[m.Status])
 	}
