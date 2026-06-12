@@ -1,0 +1,234 @@
+-- allium: 3
+-- motson.allium
+
+-- Scope: Motson — World Cup 2026 fixtures and scores
+-- Includes: fixture sync from an external provider, match store,
+--           Apple Calendar compatible feed, fixtures web page
+-- Excludes:
+--   - The provider's internals (external boundary; provider is abstract)
+--   - Authentication (feed and page are public and anonymous)
+--   - Editorial content (lineups, commentary, news)
+-- Decisions:
+--   - Single feed covering all matches; no per-team filtering
+--   - Scores are shown only once a match has finished (no in-play scores)
+--   - Pure mirror: Motson applies each provider snapshot verbatim —
+--     team names (including knockout placeholders such as "Winner
+--     Group A"), status changes in any direction, corrections, and
+--     removals. Matches absent from a snapshot are removed.
+--   - Calendar events run 2 hours for group matches and 2h45 for
+--     knockout matches (extra time and penalties)
+--   - The web page always shows when data was last synced
+
+config {
+    sync_interval: Duration = 1.hour
+    group_match_duration: Duration = 2.hours
+    knockout_match_duration: Duration = 2.hours + 45.minutes
+}
+
+------------------------------------------------------------
+-- Provider boundary
+------------------------------------------------------------
+
+-- A fixture as supplied by the external data provider. Transient:
+-- applied to Motson's own Match store on each sync.
+value ProviderFixture {
+    provider_match_id: String
+    home_team: String
+    away_team: String
+    kickoff_at: Timestamp
+    venue: String
+    stage: group | round_of_32 | round_of_16 | quarter_final | semi_final | third_place | final
+    group_name: String?
+    status: scheduled | in_play | finished | postponed | cancelled
+    home_score: Integer?
+    away_score: Integer?
+    home_penalties: Integer?
+    away_penalties: Integer?
+}
+
+contract FixtureSource {
+    fetch_fixtures: (competition: String) -> List<ProviderFixture>
+
+    @invariant FullSnapshot
+        -- Each response contains the complete set of World Cup 2026
+        -- matches, not a delta. Sync applies it as a full replace:
+        -- upsert what is present, remove what is absent.
+}
+
+------------------------------------------------------------
+-- Entities
+------------------------------------------------------------
+
+entity Match {
+    provider_match_id: String
+    home_team: String
+    away_team: String
+    kickoff_at: Timestamp
+    venue: String
+    stage: group | round_of_32 | round_of_16 | quarter_final | semi_final | third_place | final
+    group_name: String when stage = group
+    -- The lifecycle is owned by the provider; Motson stores the
+    -- status the provider last reported, in whatever direction it
+    -- moved. No transition graph is enforced.
+    provider_status: scheduled | in_play | finished | postponed | cancelled
+    home_score: Integer when provider_status = finished
+    away_score: Integer when provider_status = finished
+    -- Present only for knockout matches decided by a shootout.
+    home_penalties: Integer? when provider_status = finished
+    away_penalties: Integer? when provider_status = finished
+
+    -- Derived
+    ends_at: kickoff_at + (if stage = group: config.group_match_duration else: config.knockout_match_duration)
+}
+
+-- Singleton pacing the hourly refresh.
+entity SyncSchedule {
+    next_run_at: Timestamp
+    last_synced_at: Timestamp?
+}
+
+------------------------------------------------------------
+-- Rules
+------------------------------------------------------------
+
+rule SyncDue {
+    when: schedule: SyncSchedule.next_run_at <= now
+    ensures: schedule.next_run_at = now + config.sync_interval
+    ensures: FixtureRefreshDue(schedule)
+    @guidance
+        -- In response to FixtureRefreshDue the implementation calls
+        -- FixtureSource.fetch_fixtures; the result arrives as the
+        -- FixtureDataReceived stimulus handled below. A failed fetch
+        -- produces no stimulus: stored matches stay as they are and
+        -- the next attempt happens at next_run_at.
+}
+
+rule FixtureDataApplied {
+    when: FixtureDataReceived(schedule, fixtures)
+    ensures: schedule.last_synced_at = now
+    for fixture in fixtures:
+        let provider_match_id = fixture.provider_match_id
+        let match = Match{provider_match_id}
+        if not exists match:
+            ensures: Match.created(
+                provider_match_id: fixture.provider_match_id,
+                home_team: fixture.home_team,
+                away_team: fixture.away_team,
+                kickoff_at: fixture.kickoff_at,
+                venue: fixture.venue,
+                stage: fixture.stage,
+                group_name: fixture.group_name,
+                provider_status: fixture.status,
+                home_score: fixture.home_score,
+                away_score: fixture.away_score,
+                home_penalties: fixture.home_penalties,
+                away_penalties: fixture.away_penalties
+            )
+        else:
+            ensures: match.home_team = fixture.home_team
+            ensures: match.away_team = fixture.away_team
+            ensures: match.kickoff_at = fixture.kickoff_at
+            ensures: match.venue = fixture.venue
+            ensures: match.provider_status = fixture.status
+            ensures: match.home_score = fixture.home_score
+            ensures: match.away_score = fixture.away_score
+            ensures: match.home_penalties = fixture.home_penalties
+            ensures: match.away_penalties = fixture.away_penalties
+}
+
+rule VanishedMatchesRemoved {
+    when: FixtureDataReceived(schedule, fixtures)
+    for match in Matches where not fixtures.any(f => f.provider_match_id = match.provider_match_id):
+        ensures: not exists match
+}
+
+------------------------------------------------------------
+-- Invariants
+------------------------------------------------------------
+
+invariant NonNegativeScores {
+    for match in Matches where provider_status = finished:
+        match.home_score >= 0 and match.away_score >= 0
+}
+
+------------------------------------------------------------
+-- Surfaces
+------------------------------------------------------------
+
+surface ProviderIntegration {
+    provides:
+        FixtureDataReceived(schedule, fixtures)
+
+    contracts:
+        demands FixtureSource
+
+    @guarantee StalenessTolerated
+        -- Provider unavailability never disturbs stored matches.
+        -- Motson keeps serving the last successfully synced data.
+}
+
+surface CalendarFeed {
+    exposes:
+        for match in Matches:
+            match.home_team
+            match.away_team
+            match.kickoff_at
+            match.ends_at
+            match.venue
+            match.stage
+            match.provider_status
+            match.home_score when match.provider_status = finished
+            match.away_score when match.provider_status = finished
+            match.home_penalties when match.provider_status = finished
+            match.away_penalties when match.provider_status = finished
+
+    @guarantee AppleCalendarCompatible
+        -- The feed serialises as an iCalendar (RFC 5545) document
+        -- that Apple Calendar can subscribe to over HTTPS.
+
+    @guarantee StableEventIdentity
+        -- Each match maps to exactly one calendar event whose identity
+        -- is stable across refreshes (keyed on provider_match_id), so
+        -- subscribers see updates in place, never duplicates.
+
+    @guarantee PublicAccess
+        -- The feed requires no authentication; any client may fetch it.
+
+    @guidance
+        -- A finished match's score belongs in the event title (e.g.
+        -- "Canada 2-1 Mexico") so it is visible without opening the
+        -- event. Cancelled matches are marked cancelled rather than
+        -- removed, per iCalendar status semantics.
+}
+
+surface FixturesPage {
+    context schedule: SyncSchedule
+
+    exposes:
+        schedule.last_synced_at
+        for match in Matches:
+            match.stage
+            match.group_name when match.stage = group
+            match.home_team
+            match.away_team
+            match.kickoff_at
+            match.venue
+            match.provider_status
+            match.home_score when match.provider_status = finished
+            match.away_score when match.provider_status = finished
+            match.home_penalties when match.provider_status = finished
+            match.away_penalties when match.provider_status = finished
+
+    @guarantee PublicAccess
+        -- The page requires no authentication.
+
+    @guidance
+        -- Present matches in kickoff order; grouping by stage or by
+        -- day is a presentation choice left to implementation.
+}
+
+------------------------------------------------------------
+-- Open questions
+------------------------------------------------------------
+
+open question "Should anyone be alerted when syncs keep failing, or is the visible last-synced time on the web page enough?"
