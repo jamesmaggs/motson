@@ -12,7 +12,8 @@
     </header>
     {{range .Groups}}
     <h2>{{.Name}}</h2>
-    <table>
+    <table class="fixtures">
+      <colgroup><col class="c-kick"><col class="c-side"><col class="c-score"><col class="c-side">{{if $.HasVenues}}<col>{{end}}</colgroup>
       <thead>
         <tr><th>Kick-off</th><th colspan="3" class="match">Match</th>{{if $.HasVenues}}<th>Venue</th>{{end}}</tr>
       </thead>
