@@ -62,7 +62,7 @@ type teamDetailData struct {
 
 // teamDetail renders the TeamDetailPage surface: the team's group
 // standings, then every fixture it appears in across all stages.
-func teamDetail(store fixtures.Store) http.HandlerFunc {
+func teamDetail(store fixtures.Store, host string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		slug := r.PathValue("team")
 
@@ -95,7 +95,7 @@ func teamDetail(store fixtures.Store) http.HandlerFunc {
 			Flag:          team.Flag,
 			LastSyncedUTC: lastSynced(state),
 			AssetVersion:  assetVersion,
-			Nav:           buildNav(matches),
+			Nav:           buildNav(matches, host),
 		}
 		var own, groupMatches []fixtures.Match
 		for _, m := range matches {

@@ -35,7 +35,7 @@ type groupDetailData struct {
 // groupDetail renders the GroupDetailPage surface: one group's
 // standings table followed by its results and fixtures in kickoff
 // order. Unknown groups are not found.
-func groupDetail(store fixtures.Store) http.HandlerFunc {
+func groupDetail(store fixtures.Store, host string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		groupName := "Group " + r.PathValue("group")
 
@@ -66,7 +66,7 @@ func groupDetail(store fixtures.Store) http.HandlerFunc {
 			Standings:     standingRows(group),
 			AssetVersion:  assetVersion,
 			LastSyncedUTC: lastSynced(state),
-			Nav:           buildNav(matches),
+			Nav:           buildNav(matches, host),
 		}
 		data.Matches, data.HasVenues = buildViews(group)
 

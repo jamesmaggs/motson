@@ -10,17 +10,20 @@ import (
 // navData is the site-wide sidebar: group links then every team,
 // alphabetically, with flags. Rebuilt per request from the store.
 type navData struct {
-	Groups []navLink
-	Teams  []teamEntry
+	FeedHost string // anchors the webcal calendar link (scheme is literal in the template)
+	Groups   []navLink
+	Teams    []teamEntry
 }
 
 type navLink struct {
-	Name string
-	URL  string
+	Name   string
+	Letter string
+	URL    string
 }
 
-// buildNav derives the sidebar from the current matches.
-func buildNav(matches []fixtures.Match) navData {
+// buildNav derives the sidebar from the current matches. host anchors
+// the webcal calendar link.
+func buildNav(matches []fixtures.Match, host string) navData {
 	seen := map[string]bool{}
 	var groups []navLink
 	for _, m := range matches {
@@ -29,9 +32,13 @@ func buildNav(matches []fixtures.Match) navData {
 		}
 		seen[m.GroupName] = true
 		if letter, ok := strings.CutPrefix(m.GroupName, "Group "); ok {
-			groups = append(groups, navLink{Name: m.GroupName, URL: "/groups/" + letter})
+			groups = append(groups, navLink{Name: m.GroupName, Letter: letter, URL: "/groups/" + letter})
 		}
 	}
 	sort.Slice(groups, func(i, j int) bool { return groups[i].Name < groups[j].Name })
-	return navData{Groups: groups, Teams: collectTeams(matches)}
+	return navData{
+		FeedHost: host,
+		Groups:   groups,
+		Teams:    collectTeams(matches),
+	}
 }

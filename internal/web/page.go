@@ -84,7 +84,7 @@ func page(store fixtures.Store, host string) http.HandlerFunc {
 			return
 		}
 
-		data := pageData{FeedHost: host, AssetVersion: assetVersion, LastSyncedUTC: lastSynced(state), Nav: buildNav(matches)}
+		data := pageData{FeedHost: host, AssetVersion: assetVersion, LastSyncedUTC: lastSynced(state), Nav: buildNav(matches, host)}
 		data.Matches, data.HasVenues = buildViews(matches)
 
 		render(w, "index.html.tmpl", data)

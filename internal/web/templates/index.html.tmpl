@@ -6,9 +6,6 @@
   <div class="layout">
     {{template "sidebar" .Nav}}
     <main class="content">
-      <p class="subscribe">
-        <a href="webcal://{{.FeedHost}}/calendar.ics">Subscribe in your calendar</a>
-      </p>
     <div class="cards">
       {{range .Matches}}
       <article class="card{{if .Live}} live{{end}}">

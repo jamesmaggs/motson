@@ -25,12 +25,37 @@ func TestSidebarListsGroupsAndTeams(t *testing.T) {
 			t.Errorf("%s: sidebar missing", path)
 			continue
 		}
-		if !strings.Contains(body, `<ul class="nav-groups">`) || !strings.Contains(body, `<a href="/groups/A"><span class="flag"></span>Group A</a>`) {
-			t.Errorf("%s: group links missing from sidebar", path)
+		if !strings.Contains(body, `<div class="nav-group-grid">`) || !strings.Contains(body, `<a class="group-badge" href="/groups/A">A</a>`) {
+			t.Errorf("%s: group letter badges missing from sidebar", path)
 		}
 		if !strings.Contains(body, `<ul class="nav-teams">`) ||
 			!strings.Contains(body, `<a href="/teams/argentina"><span class="flag">🇦🇷</span>Argentina</a>`) {
 			t.Errorf("%s: team link with flag missing from sidebar: %s", path, body)
+		}
+	}
+}
+
+// The sidebar's first entry is an "Add to Calendar" link (with an
+// icon) to the webcal feed, above the groups.
+func TestSidebarHasAddToCalendar(t *testing.T) {
+	for _, path := range []string{"/", "/groups/A", "/teams/canada"} {
+		body := get(t, navSpread(t), now, path).Body.String()
+
+		if !strings.Contains(body, `href="webcal://motson.jamesmaggs.com/calendar.ics"`) {
+			t.Errorf("%s: Add to Calendar link missing", path)
+		}
+		if !strings.Contains(body, "Add to Calendar") {
+			t.Errorf("%s: Add to Calendar text missing", path)
+		}
+		cal := strings.Index(body, "Add to Calendar")
+		groups := strings.Index(body, `class="nav-heading">Groups`)
+		if cal < 0 || groups < 0 || cal > groups {
+			t.Errorf("%s: Add to Calendar should sit above the Groups heading", path)
+		}
+		// An icon precedes the link text.
+		entry := body[strings.Index(body, `class="add-cal"`):]
+		if i := strings.Index(entry, "Add to Calendar"); i < 0 || !strings.Contains(entry[:i], "<svg") {
+			t.Errorf("%s: calendar icon missing before the link text", path)
 		}
 	}
 }
