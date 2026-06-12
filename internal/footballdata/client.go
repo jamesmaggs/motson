@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Jazzatola/motson/internal/fixtures"
+	"github.com/jamesmaggs/motson/internal/fixtures"
 )
 
 type Client struct {

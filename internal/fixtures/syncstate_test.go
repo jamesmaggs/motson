@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Jazzatola/motson/internal/fixtures"
+	"github.com/jamesmaggs/motson/internal/fixtures"
 )
 
 // Obligation: derived.SyncSchedule.is_stale — stale when never synced,

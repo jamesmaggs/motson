@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Jazzatola/motson/internal/fixtures"
+	"github.com/jamesmaggs/motson/internal/fixtures"
 )
 
 //go:embed templates/index.html.tmpl

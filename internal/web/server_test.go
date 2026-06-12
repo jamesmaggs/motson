@@ -10,9 +10,9 @@ import (
 
 	ics "github.com/arran4/golang-ical"
 
-	"github.com/Jazzatola/motson/internal/fixtures"
-	"github.com/Jazzatola/motson/internal/store"
-	"github.com/Jazzatola/motson/internal/web"
+	"github.com/jamesmaggs/motson/internal/fixtures"
+	"github.com/jamesmaggs/motson/internal/store"
+	"github.com/jamesmaggs/motson/internal/web"
 )
 
 var now = time.Date(2026, 6, 13, 12, 0, 0, 0, time.UTC)

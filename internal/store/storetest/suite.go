@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Jazzatola/motson/internal/fixtures"
+	"github.com/jamesmaggs/motson/internal/fixtures"
 )
 
 func intp(i int) *int { return &i }

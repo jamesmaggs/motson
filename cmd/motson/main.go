@@ -10,11 +10,11 @@ import (
 	"os"
 	"time"
 
-	"github.com/Jazzatola/motson/internal/config"
-	"github.com/Jazzatola/motson/internal/footballdata"
-	"github.com/Jazzatola/motson/internal/store"
-	"github.com/Jazzatola/motson/internal/syncer"
-	"github.com/Jazzatola/motson/internal/web"
+	"github.com/jamesmaggs/motson/internal/config"
+	"github.com/jamesmaggs/motson/internal/footballdata"
+	"github.com/jamesmaggs/motson/internal/store"
+	"github.com/jamesmaggs/motson/internal/syncer"
+	"github.com/jamesmaggs/motson/internal/web"
 )
 
 // tickInterval is how often the ticker checks whether the persisted

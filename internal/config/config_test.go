@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Jazzatola/motson/internal/config"
+	"github.com/jamesmaggs/motson/internal/config"
 )
 
 func valid() map[string]string {

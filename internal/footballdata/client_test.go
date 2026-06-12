@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Jazzatola/motson/internal/fixtures"
-	"github.com/Jazzatola/motson/internal/footballdata"
+	"github.com/jamesmaggs/motson/internal/fixtures"
+	"github.com/jamesmaggs/motson/internal/footballdata"
 )
 
 const sampleResponse = `{

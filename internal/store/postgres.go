@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/Jazzatola/motson/internal/fixtures"
+	"github.com/jamesmaggs/motson/internal/fixtures"
 )
 
 // schema is applied idempotently at boot (ADR 0006). sync_state is a

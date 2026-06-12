@@ -5,9 +5,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/Jazzatola/motson/internal/fixtures"
-	"github.com/Jazzatola/motson/internal/store"
-	"github.com/Jazzatola/motson/internal/store/storetest"
+	"github.com/jamesmaggs/motson/internal/fixtures"
+	"github.com/jamesmaggs/motson/internal/store"
+	"github.com/jamesmaggs/motson/internal/store/storetest"
 )
 
 // The same contract suite as the memory fake, against real Postgres

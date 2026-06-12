@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Jazzatola/motson/internal/fixtures"
+	"github.com/jamesmaggs/motson/internal/fixtures"
 )
 
 // Obligations: config-default.sync_interval, config-default.group_match_duration,

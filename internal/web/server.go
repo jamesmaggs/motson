@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Jazzatola/motson/internal/feed"
-	"github.com/Jazzatola/motson/internal/fixtures"
+	"github.com/jamesmaggs/motson/internal/feed"
+	"github.com/jamesmaggs/motson/internal/fixtures"
 )
 
 // NewHandler routes the public surfaces. host anchors feed UIDs; clock

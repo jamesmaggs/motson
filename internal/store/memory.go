@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Jazzatola/motson/internal/fixtures"
+	"github.com/jamesmaggs/motson/internal/fixtures"
 )
 
 // Memory is the in-memory fixtures.Store used by behavioural tests.

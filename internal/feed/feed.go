@@ -9,7 +9,7 @@ import (
 
 	ics "github.com/arran4/golang-ical"
 
-	"github.com/Jazzatola/motson/internal/fixtures"
+	"github.com/jamesmaggs/motson/internal/fixtures"
 )
 
 // Render serialises the matches as an iCalendar document. host anchors

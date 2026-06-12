@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Jazzatola/motson/internal/fixtures"
-	"github.com/Jazzatola/motson/internal/store"
-	"github.com/Jazzatola/motson/internal/syncer"
+	"github.com/jamesmaggs/motson/internal/fixtures"
+	"github.com/jamesmaggs/motson/internal/store"
+	"github.com/jamesmaggs/motson/internal/syncer"
 )
 
 type fakeSource struct {

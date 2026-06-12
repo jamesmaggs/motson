@@ -1,4 +1,4 @@
-module github.com/Jazzatola/motson
+module github.com/jamesmaggs/motson
 
 go 1.25.0
 

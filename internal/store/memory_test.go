@@ -3,9 +3,9 @@ package store_test
 import (
 	"testing"
 
-	"github.com/Jazzatola/motson/internal/fixtures"
-	"github.com/Jazzatola/motson/internal/store"
-	"github.com/Jazzatola/motson/internal/store/storetest"
+	"github.com/jamesmaggs/motson/internal/fixtures"
+	"github.com/jamesmaggs/motson/internal/store"
+	"github.com/jamesmaggs/motson/internal/store/storetest"
 )
 
 func TestMemoryStoreContract(t *testing.T) {
