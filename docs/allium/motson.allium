@@ -23,6 +23,9 @@ config {
     sync_interval: Duration = 1.hour
     group_match_duration: Duration = 2.hours
     knockout_match_duration: Duration = 2.hours + 45.minutes
+    -- Three consecutive missed syncs before the system reports
+    -- itself unhealthy.
+    staleness_threshold: Duration = 3.hours
 }
 
 ------------------------------------------------------------
@@ -85,6 +88,9 @@ entity Match {
 entity SyncSchedule {
     next_run_at: Timestamp
     last_synced_at: Timestamp?
+
+    -- Derived
+    is_stale: last_synced_at = null or last_synced_at + config.staleness_threshold <= now
 }
 
 ------------------------------------------------------------
@@ -227,8 +233,21 @@ surface FixturesPage {
         -- day is a presentation choice left to implementation.
 }
 
-------------------------------------------------------------
--- Open questions
-------------------------------------------------------------
+surface HealthCheck {
+    context schedule: SyncSchedule
 
-open question "Should anyone be alerted when syncs keep failing, or is the visible last-synced time on the web page enough?"
+    exposes:
+        schedule.is_stale
+        schedule.last_synced_at
+
+    @guarantee StalenessIsUnhealthy
+        -- The health boundary reports unhealthy whenever the last
+        -- successful sync is older than config.staleness_threshold
+        -- (or has never happened), so an external monitor can alert
+        -- a human about quietly failing syncs.
+
+    @guidance
+        -- Implemented as a health endpoint that an external uptime
+        -- monitor pings and that the hosting platform uses as its
+        -- health check. See ADR 0008.
+}
