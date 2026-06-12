@@ -99,6 +99,19 @@ func TestVenueColumnShownWhenVenuesAvailable(t *testing.T) {
 	}
 }
 
+// A football leads the page title, and the favicon is the same
+// emoji (served as an inline SVG so no icon asset is needed).
+func TestPageHasFootballTitleAndFavicon(t *testing.T) {
+	body := get(t, seeded(t, match("wc-1")), now, "/").Body.String()
+
+	if !strings.Contains(body, "<h1>⚽ World Cup 2026</h1>") {
+		t.Errorf("title missing leading football emoji: %s", body)
+	}
+	if !strings.Contains(body, `rel="icon"`) || !strings.Contains(body, "image/svg+xml") {
+		t.Errorf("favicon link missing: %s", body)
+	}
+}
+
 // Static asset URLs carry a per-build version so edge caches (e.g.
 // Cloudflare ahead of the custom domain) can't serve a previous
 // build's CSS or fonts after a deploy.

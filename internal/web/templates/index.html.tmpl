@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Motson — World Cup 2026 fixtures</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>">
   <link rel="stylesheet" href="/static/pico.min.css?v={{.AssetVersion}}">
   <link rel="stylesheet" href="/static/fonts.css?v={{.AssetVersion}}">
   <link rel="alternate" type="text/calendar" title="World Cup 2026 calendar" href="/calendar.ics">
@@ -24,13 +25,14 @@
     td.score { text-align: center; font-weight: 700; font-size: 1.15em; white-space: nowrap; color: #ffd23f; font-variant-numeric: tabular-nums; text-shadow: 0 0 12px rgba(255, 210, 63, .35); }
     td.away { text-align: left; }
     .state { color: #79838e; font-weight: 400; text-shadow: none; }
+    td.score .state { font-size: .7em; }
     footer p { font-size: .75em; }
   </style>
 </head>
 <body>
   <main class="container">
     <header>
-      <h1>World Cup 2026</h1>
+      <h1>⚽ World Cup 2026</h1>
       <p>
         Fixtures and scores, updated hourly.
         <a href="webcal://{{.FeedHost}}/calendar.ics">Subscribe in your calendar</a>
