@@ -154,5 +154,8 @@ func groupName(group *string) string {
 	if group == nil {
 		return ""
 	}
-	return strings.Replace(strings.Title(strings.ToLower(strings.ReplaceAll(*group, "_", " "))), "Group", "Group", 1)
+	if letter, ok := strings.CutPrefix(*group, "GROUP_"); ok {
+		return "Group " + letter
+	}
+	return *group
 }
