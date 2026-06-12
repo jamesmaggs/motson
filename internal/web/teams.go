@@ -46,35 +46,6 @@ func collectTeams(matches []fixtures.Match) []teamEntry {
 	return teams
 }
 
-type teamsData struct {
-	Teams         []teamEntry
-	LastSyncedUTC string
-	AssetVersion  string
-	Nav           navData
-}
-
-// teams renders the TeamsPage surface: the team directory.
-func teams(store fixtures.Store) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		matches, err := store.Matches(r.Context())
-		if err != nil {
-			http.Error(w, "fixtures unavailable", http.StatusInternalServerError)
-			return
-		}
-		state, err := store.SyncState(r.Context())
-		if err != nil {
-			http.Error(w, "fixtures unavailable", http.StatusInternalServerError)
-			return
-		}
-		render(w, "teams.html.tmpl", teamsData{
-			Teams:         collectTeams(matches),
-			LastSyncedUTC: lastSynced(state),
-			AssetVersion:  assetVersion,
-			Nav:           buildNav(matches),
-		})
-	}
-}
-
 type teamDetailData struct {
 	TeamName      string
 	Flag          string

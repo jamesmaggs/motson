@@ -18,7 +18,7 @@ func navSpread(t *testing.T) fixtures.Store {
 // The sidebar appears on every page, listing each group (linked) and
 // every team alphabetically with a flag, linked to its page.
 func TestSidebarListsGroupsAndTeams(t *testing.T) {
-	for _, path := range []string{"/", "/groups", "/groups/A", "/teams", "/teams/canada"} {
+	for _, path := range []string{"/", "/groups/A", "/teams/canada"} {
 		body := get(t, navSpread(t), now, path).Body.String()
 
 		if !strings.Contains(body, `class="sidebar"`) {

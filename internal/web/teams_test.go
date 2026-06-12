@@ -29,36 +29,6 @@ func teamSpread(t *testing.T) fixtures.Store {
 	return seeded(t, match("wc-a1"), groupF, knockout, tbc)
 }
 
-// Guarantee: TeamDirectory — every named team once, alphabetical,
-// flagged, linked; unnamed sides absent.
-func TestTeamsDirectory(t *testing.T) {
-	rec := get(t, teamSpread(t), now, "/teams")
-
-	if rec.Code != http.StatusOK {
-		t.Fatalf("status = %d, want 200", rec.Code)
-	}
-	body := rec.Body.String()
-	for _, want := range []string{
-		`<a href="/teams/canada">`, `<a href="/teams/south-korea">`,
-		`<a href="/teams/czechia">`, `<a href="/teams/france">`, `<a href="/teams/mexico">`,
-		"🇰🇷",
-	} {
-		if !strings.Contains(body, want) {
-			t.Errorf("teams directory missing %q", want)
-		}
-	}
-	main := mainContent(body)
-	if got := strings.Count(main, `href="/teams/canada"`); got != 1 {
-		t.Errorf("Canada listed %d times in the directory, want once", got)
-	}
-	if strings.Contains(main, "TBC") {
-		t.Errorf("unnamed sides must not appear in the directory")
-	}
-	if canada, czechia := strings.Index(main, "/teams/canada"), strings.Index(main, "/teams/czechia"); canada > czechia {
-		t.Errorf("directory not alphabetical")
-	}
-}
-
 // Guarantee: OnePagePerTeam — hyphenated slug, flag beside the title,
 // group standings, and every fixture across stages.
 func TestTeamDetailPage(t *testing.T) {
@@ -124,9 +94,5 @@ func TestTeamNamesLinkEverywhere(t *testing.T) {
 	groupPage := get(t, st, now, "/groups/A").Body.String()
 	if !strings.Contains(groupPage, `<a href="/teams/mexico">Mexico</a>`) {
 		t.Errorf("group standings missing team link: %s", groupPage)
-	}
-
-	if !strings.Contains(index, `href="/teams"`) {
-		t.Errorf("root page missing link to the teams directory")
 	}
 }

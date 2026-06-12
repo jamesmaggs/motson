@@ -279,48 +279,7 @@ surface FixturesPage {
         -- score.
 
     related:
-        GroupFixturesPage(schedule)
         GroupDetailPage(schedule)
-}
-
-surface GroupFixturesPage {
-    context schedule: SyncSchedule
-
-    exposes:
-        schedule.last_synced_at
-        for match in Matches where stage = group:
-            match.group_name
-            match.home_team
-            match.away_team
-            match.kickoff_at
-            match.venue when match.venue != null
-            match.provider_status
-            match.home_score when match.provider_status = finished
-            match.away_score when match.provider_status = finished
-
-    @guarantee GroupStageOnly
-        -- Only group-stage matches appear on this view; knockout
-        -- fixtures are absent. Matches are organised into one
-        -- section per group.
-
-    @guarantee PublicAccess
-        -- The page requires no authentication.
-
-    @guarantee TeamFlags
-        -- Same reading order as FixturesPage: home name, home flag,
-        -- score, away flag, away name.
-
-    @guarantee TeamNamesLink
-        -- Every named team's name links to its TeamDetailPage.
-
-    @guidance
-        -- Groups are ordered alphabetically (Group A through Group
-        -- L); within a group, matches are in kickoff order. The view
-        -- shares FixturesPage's visual treatment, dropping the stage
-        -- column that grouping makes redundant.
-
-    related:
-        FixturesPage(schedule)
 }
 
 surface GroupDetailPage {
@@ -370,28 +329,6 @@ surface GroupDetailPage {
 
     related:
         FixturesPage(schedule)
-        GroupFixturesPage(schedule)
-}
-
-surface TeamsPage {
-    context schedule: SyncSchedule
-
-    exposes:
-        schedule.last_synced_at
-        for match in Matches:
-            match.home_team
-            match.away_team
-
-    @guarantee TeamDirectory
-        -- Every named team appearing in any fixture is listed exactly
-        -- once, alphabetically, with its flag, linking to its
-        -- TeamDetailPage. Unnamed sides do not appear.
-
-    @guarantee PublicAccess
-        -- The page requires no authentication.
-
-    related:
-        FixturesPage(schedule)
 }
 
 surface TeamDetailPage {
@@ -428,7 +365,6 @@ surface TeamDetailPage {
 
     related:
         GroupDetailPage(schedule)
-        TeamsPage(schedule)
         FixturesPage(schedule)
 }
 

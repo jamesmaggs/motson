@@ -17,9 +17,7 @@ import (
 func NewHandler(store fixtures.Store, host string, clock func() time.Time) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /{$}", page(store, host))
-	mux.HandleFunc("GET /groups", groups(store))
 	mux.HandleFunc("GET /groups/{group}", groupDetail(store))
-	mux.HandleFunc("GET /teams", teams(store))
 	mux.HandleFunc("GET /teams/{team}", teamDetail(store))
 	mux.HandleFunc("GET /healthz", healthz(store, clock))
 	mux.HandleFunc("GET /calendar.ics", calendar(store, host))
