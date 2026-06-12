@@ -39,8 +39,8 @@ func TestGroupDetailShowsStandingsThenMatches(t *testing.T) {
 			t.Errorf("group page missing %q", want)
 		}
 	}
-	if strings.Contains(body, "Spain") || strings.Contains(body, "Group B") {
-		t.Errorf("other group leaked into /groups/A: %s", body)
+	if main := mainContent(body); strings.Contains(main, "Spain") || strings.Contains(main, "Group B") {
+		t.Errorf("other group leaked into /groups/A: %s", main)
 	}
 	if standings, matches := strings.Index(body, "Pts"), strings.Index(body, `<td class="score">`); standings > matches {
 		t.Errorf("standings table must precede the match list")

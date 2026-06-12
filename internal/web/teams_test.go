@@ -47,13 +47,14 @@ func TestTeamsDirectory(t *testing.T) {
 			t.Errorf("teams directory missing %q", want)
 		}
 	}
-	if got := strings.Count(body, `href="/teams/canada"`); got != 1 {
-		t.Errorf("Canada listed %d times, want once", got)
+	main := mainContent(body)
+	if got := strings.Count(main, `href="/teams/canada"`); got != 1 {
+		t.Errorf("Canada listed %d times in the directory, want once", got)
 	}
-	if strings.Contains(body, "TBC") {
+	if strings.Contains(main, "TBC") {
 		t.Errorf("unnamed sides must not appear in the directory")
 	}
-	if canada, czechia := strings.Index(body, "/teams/canada"), strings.Index(body, "/teams/czechia"); canada > czechia {
+	if canada, czechia := strings.Index(main, "/teams/canada"), strings.Index(main, "/teams/czechia"); canada > czechia {
 		t.Errorf("directory not alphabetical")
 	}
 }

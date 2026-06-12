@@ -49,6 +49,18 @@ func seeded(t *testing.T, matches ...fixtures.Match) fixtures.Store {
 	return st
 }
 
+// mainContent returns just the <main> region, excluding the site-wide
+// sidebar (which lists every group and team). Use it for assertions
+// that a page does not show other groups'/teams' content.
+func mainContent(body string) string {
+	i := strings.Index(body, `<main`)
+	j := strings.Index(body, `</main>`)
+	if i < 0 || j < 0 {
+		return body
+	}
+	return body[i:j]
+}
+
 // Guarantee: StalenessIsUnhealthy — healthy while fresh.
 func TestHealthzHealthyWhenFresh(t *testing.T) {
 	rec := get(t, seeded(t, match("wc-1")), now.Add(time.Hour), "/healthz")

@@ -50,6 +50,7 @@ type teamsData struct {
 	Teams         []teamEntry
 	LastSyncedUTC string
 	AssetVersion  string
+	Nav           navData
 }
 
 // teams renders the TeamsPage surface: the team directory.
@@ -69,6 +70,7 @@ func teams(store fixtures.Store) http.HandlerFunc {
 			Teams:         collectTeams(matches),
 			LastSyncedUTC: lastSynced(state),
 			AssetVersion:  assetVersion,
+			Nav:           buildNav(matches),
 		})
 	}
 }
@@ -84,6 +86,7 @@ type teamDetailData struct {
 	LastSyncedUTC string
 	AssetVersion  string
 	HasVenues     bool
+	Nav           navData
 }
 
 // teamDetail renders the TeamDetailPage surface: the team's group
@@ -121,6 +124,7 @@ func teamDetail(store fixtures.Store) http.HandlerFunc {
 			Flag:          team.Flag,
 			LastSyncedUTC: lastSynced(state),
 			AssetVersion:  assetVersion,
+			Nav:           buildNav(matches),
 		}
 		var own, groupMatches []fixtures.Match
 		for _, m := range matches {

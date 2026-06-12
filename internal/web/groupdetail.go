@@ -29,6 +29,7 @@ type groupDetailData struct {
 	LastSyncedUTC string
 	AssetVersion  string
 	HasVenues     bool
+	Nav           navData
 }
 
 // groupDetail renders the GroupDetailPage surface: one group's
@@ -65,6 +66,7 @@ func groupDetail(store fixtures.Store) http.HandlerFunc {
 			Standings:     standingRows(group),
 			AssetVersion:  assetVersion,
 			LastSyncedUTC: lastSynced(state),
+			Nav:           buildNav(matches),
 		}
 		data.Matches, data.HasVenues = buildViews(group)
 

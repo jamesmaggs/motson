@@ -40,8 +40,8 @@ func TestGroupsViewShowsOnlyGroupGamesBySection(t *testing.T) {
 			t.Errorf("groups view missing %q", want)
 		}
 	}
-	if strings.Contains(body, "Brazil") || strings.Contains(body, "Semi-final") {
-		t.Errorf("knockout fixture leaked into groups view: %s", body)
+	if main := mainContent(body); strings.Contains(main, "Brazil") || strings.Contains(main, "Semi-final") {
+		t.Errorf("knockout fixture leaked into groups view: %s", main)
 	}
 }
 

@@ -13,6 +13,7 @@ type groupsData struct {
 	LastSyncedUTC string
 	AssetVersion  string
 	HasVenues     bool
+	Nav           navData
 }
 
 type groupSection struct {
@@ -37,7 +38,7 @@ func groups(store fixtures.Store) http.HandlerFunc {
 			return
 		}
 
-		data := groupsData{AssetVersion: assetVersion, LastSyncedUTC: lastSynced(state)}
+		data := groupsData{AssetVersion: assetVersion, LastSyncedUTC: lastSynced(state), Nav: buildNav(matches)}
 		index := map[string]int{}
 		for _, m := range matches {
 			if m.Stage != fixtures.StageGroup {
