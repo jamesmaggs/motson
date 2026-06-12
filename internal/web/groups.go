@@ -3,6 +3,7 @@ package web
 import (
 	"net/http"
 	"sort"
+	"strings"
 
 	"github.com/jamesmaggs/motson/internal/fixtures"
 )
@@ -16,6 +17,7 @@ type groupsData struct {
 
 type groupSection struct {
 	Name    string
+	URL     string
 	Matches []matchView
 }
 
@@ -45,7 +47,11 @@ func groups(store fixtures.Store) http.HandlerFunc {
 			if !ok {
 				i = len(data.Groups)
 				index[m.GroupName] = i
-				data.Groups = append(data.Groups, groupSection{Name: m.GroupName})
+				section := groupSection{Name: m.GroupName}
+				if letter, ok := strings.CutPrefix(m.GroupName, "Group "); ok {
+					section.URL = "/groups/" + letter
+				}
+				data.Groups = append(data.Groups, section)
 			}
 			data.Groups[i].Matches = append(data.Groups[i].Matches, viewOf(m))
 			if m.Venue != "" {

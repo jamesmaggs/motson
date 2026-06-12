@@ -75,6 +75,17 @@ func TestGroupsViewSharesFixtureTreatment(t *testing.T) {
 	}
 }
 
+// Group section headings link to their group's detail page.
+func TestGroupHeadingsLinkToGroupPages(t *testing.T) {
+	body := get(t, groupStageSpread(t), now, "/groups").Body.String()
+
+	for _, want := range []string{`<h2><a href="/groups/A">Group A</a></h2>`, `<h2><a href="/groups/B">Group B</a></h2>`} {
+		if !strings.Contains(body, want) {
+			t.Errorf("groups view missing linked heading %q", want)
+		}
+	}
+}
+
 // The two views link to each other (spec: related surfaces).
 func TestViewsLinkToEachOther(t *testing.T) {
 	st := groupStageSpread(t)

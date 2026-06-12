@@ -11,7 +11,7 @@
       </p>
     </header>
     {{range .Groups}}
-    <h2>{{.Name}}</h2>
+    <h2>{{if .URL}}<a href="{{.URL}}">{{.Name}}</a>{{else}}{{.Name}}{{end}}</h2>
     <table class="fixtures">
       <colgroup><col class="c-kick"><col class="c-side"><col class="c-score"><col class="c-side">{{if $.HasVenues}}<col>{{end}}</colgroup>
       <thead>
