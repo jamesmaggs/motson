@@ -4,6 +4,7 @@
 package footballdata
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -12,8 +13,6 @@ import (
 	"time"
 
 	"github.com/Jazzatola/motson/internal/fixtures"
-
-	"context"
 )
 
 type Client struct {
@@ -37,15 +36,15 @@ type matchesResponse struct {
 }
 
 type providerMatch struct {
-	ID       int64  `json:"id"`
+	ID       int64     `json:"id"`
 	UTCDate  time.Time `json:"utcDate"`
-	Status   string `json:"status"`
-	Stage    string `json:"stage"`
-	Group    *string `json:"group"`
-	Venue    string `json:"venue"`
-	HomeTeam team   `json:"homeTeam"`
-	AwayTeam team   `json:"awayTeam"`
-	Score    score  `json:"score"`
+	Status   string    `json:"status"`
+	Stage    string    `json:"stage"`
+	Group    *string   `json:"group"`
+	Venue    string    `json:"venue"`
+	HomeTeam team      `json:"homeTeam"`
+	AwayTeam team      `json:"awayTeam"`
+	Score    score     `json:"score"`
 }
 
 type team struct {
