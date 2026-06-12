@@ -68,10 +68,13 @@
     .venue { text-align: center; color: #79838e; font-size: .72rem; margin-top: .9rem; }
     .status { text-align: center; color: #79838e; font-size: .72rem; margin-top: .9rem; }
 
-    /* Full-width site header above a two-column layout */
+    /* Full-width site header above a two-column layout. The mascot is
+       sized in rem so it scales with the header's type, and sits flush
+       against the bottom border on the right. */
     .site-header { border-bottom: 1px solid #232a32; }
-    .site-header-inner { max-width: 1180px; margin: 0 auto; padding: 1.2rem 1.5rem; }
-    .site-header h1 { margin: 0; }
+    .site-header-inner { display: flex; justify-content: space-between; align-items: flex-end; max-width: 1180px; margin: 0 auto; padding: 1.2rem 1.5rem 0; }
+    .site-header h1 { margin: 0 0 1.2rem; }
+    .site-header .mascot { height: 6rem; width: auto; display: block; }
     .layout { display: flex; gap: 2rem; max-width: 1180px; margin: 0 auto; padding: 1.5rem; align-items: flex-start; }
     .content { flex: 1 1 auto; min-width: 0; }
     .content .intro { margin-top: 0; color: #8d97a3; }
@@ -95,7 +98,10 @@
 
 {{define "siteheader"}}
   <header class="site-header">
-    <div class="site-header-inner"><h1>⚽ World Cup 2026</h1></div>
+    <div class="site-header-inner">
+      <h1>⚽ World Cup 2026</h1>
+      <img class="mascot" src="/static/motson.png?v={{.AssetVersion}}" alt="John Motson">
+    </div>
   </header>
 {{end}}
 
