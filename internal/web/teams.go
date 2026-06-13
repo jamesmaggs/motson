@@ -66,14 +66,8 @@ func teamDetail(store fixtures.Store, host string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		slug := r.PathValue("team")
 
-		matches, err := store.Matches(r.Context())
-		if err != nil {
-			errFixturesUnavailable(w)
-			return
-		}
-		state, err := store.SyncState(r.Context())
-		if err != nil {
-			errFixturesUnavailable(w)
+		matches, state, ok := loadFixtures(w, r, store)
+		if !ok {
 			return
 		}
 

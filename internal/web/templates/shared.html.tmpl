@@ -50,35 +50,15 @@
     main h1, main h2, main p, main th, main td, footer p { color: var(--ink); }
     h1 { color: #fff; font-family: "Bebas Neue", Sora, sans-serif; font-weight: 400; font-size: 3rem; letter-spacing: .06em; }
     h2 { color: #fff; font-family: "Bebas Neue", Sora, sans-serif; font-weight: 400; font-size: 1.6rem; letter-spacing: .06em; margin: 2.5rem 0 0; }
-    table { --pico-background-color: transparent; font-size: .85em; margin-top: 2.5rem; margin-bottom: 2.5rem; }
-    h2 + table { margin-top: .75rem; }
-    h3 { color: var(--muted); font-family: "Bebas Neue", Sora, sans-serif; font-weight: 400; font-size: 1.1rem; letter-spacing: .08em; margin: 2rem 0 0; }
-    h3 + table { margin-top: .75rem; }
-    h3 a { color: inherit; text-decoration: none; }
-    h3 a:hover { text-decoration: underline; }
-    ul.teams { list-style: none; padding: 0; margin: 2.5rem 0; columns: 3; }
-    ul.teams li { margin: .4rem 0; }
-    ul.teams a, p.teams a { color: inherit; text-decoration: none; }
-    ul.teams a:hover, p.teams a:hover { text-decoration: underline; }
-    p.teams { line-height: 2; }
-    table.fixtures { table-layout: fixed; }
-    col.c-kick { width: 24%; }
-    col.c-side { width: 31%; }
-    col.c-score { width: 14%; }
-    tbody td { font-weight: 300; }
-    thead th { color: var(--muted); border-bottom: 2px solid var(--border-line); text-transform: uppercase; font-size: .8em; letter-spacing: .08em; }
-    thead th.match { text-align: center; }
-    tbody td { border-color: var(--border-soft); }
-    tbody tr:hover { background: var(--row-hover); }
     a { color: var(--accent); }
-    tbody td a, h2 a { color: inherit; text-decoration: none; }
-    tbody td a:hover, h2 a:hover { text-decoration: underline; }
-    .fixture td:first-child { white-space: nowrap; }
-    td.home { text-align: right; }
-    td.score { text-align: center; font-weight: 700; font-size: 1.15em; white-space: nowrap; color: var(--accent); font-variant-numeric: tabular-nums; text-shadow: 0 0 12px rgba(var(--accent-rgb), .35); }
-    td.away { text-align: left; }
+    /* Standings table (always inside .standings-card). */
+    table { --pico-background-color: transparent; }
+    thead th { color: var(--muted); border-bottom: 2px solid var(--border-line); text-transform: uppercase; font-size: .8em; letter-spacing: .08em; }
+    tbody td { font-weight: 300; border-color: var(--border-soft); }
+    tbody tr:hover { background: var(--row-hover); }
+    tbody td a { color: inherit; text-decoration: none; }
+    tbody td a:hover { text-decoration: underline; }
     .state { color: var(--muted); font-weight: 400; text-shadow: none; }
-    td.score .state { font-size: .7em; }
     footer p { font-size: .75em; }
 
     /* Match cards (index) */
@@ -168,8 +148,6 @@
     .site-header .mascot { height: 6rem; width: auto; display: block; }
     .layout { display: flex; gap: 1rem; max-width: 1180px; margin: 0 auto; padding: 1.5rem; align-items: flex-start; }
     .content { flex: 1 1 auto; min-width: 0; }
-    .content .intro { margin-top: 0; color: var(--muted); }
-    .content .subscribe { margin-top: 0; }
     /* The sidebar scrolls with the page so the full team list is reachable.
        Its background sits between the page (var(--bg)) and the cards (var(--surface)). */
     .sidebar { flex: 0 0 260px; background: var(--surface-2); border-radius: 12px; padding: .5rem 1rem 1rem; }
@@ -262,16 +240,6 @@
       </nav>
       </div>
     </aside>
-{{end}}
-
-{{define "matchCells"}}
-          <td class="home">{{if .HomeURL}}<a href="{{.HomeURL}}">{{.HomeTeam}}{{if .HomeFlag}} {{.HomeFlag}}{{end}}</a>{{else}}{{.HomeTeam}}{{if .HomeFlag}} {{.HomeFlag}}{{end}}{{end}}</td>
-          <td class="score">
-            {{if .Score}}{{.Score}}{{else}}<span class="state">vs</span>{{end}}
-            {{if .Pens}}<br><small class="state">{{.Pens}}</small>{{end}}
-            {{if .StatusLabel}}<br><small class="state">{{.StatusLabel}}</small>{{end}}
-          </td>
-          <td class="away">{{if .AwayURL}}<a href="{{.AwayURL}}">{{if .AwayFlag}}{{.AwayFlag}} {{end}}{{.AwayTeam}}</a>{{else}}{{if .AwayFlag}}{{.AwayFlag}} {{end}}{{.AwayTeam}}{{end}}</td>
 {{end}}
 
 {{define "matchCard"}}

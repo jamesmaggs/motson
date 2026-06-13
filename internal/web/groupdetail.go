@@ -42,14 +42,8 @@ func groupDetail(store fixtures.Store, host string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		groupName := "Group " + r.PathValue("group")
 
-		matches, err := store.Matches(r.Context())
-		if err != nil {
-			errFixturesUnavailable(w)
-			return
-		}
-		state, err := store.SyncState(r.Context())
-		if err != nil {
-			errFixturesUnavailable(w)
+		matches, state, ok := loadFixtures(w, r, store)
+		if !ok {
 			return
 		}
 

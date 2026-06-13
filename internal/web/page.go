@@ -38,7 +38,6 @@ type pageData struct {
 	Matches         []matchView
 	LastSyncedUTC   string
 	LastSyncedLabel string
-	FeedHost        string
 	HasVenues       bool
 	AssetVersion    string
 	Nav             navData
@@ -81,6 +80,22 @@ func errFixturesUnavailable(w http.ResponseWriter) {
 		"We couldn't load the fixtures just now. Please try again in a moment.")
 }
 
+// loadFixtures reads the matches and sync state every HTML page needs,
+// rendering the styled 500 and returning ok=false if the store fails.
+func loadFixtures(w http.ResponseWriter, r *http.Request, store fixtures.Store) (matches []fixtures.Match, state fixtures.SyncState, ok bool) {
+	matches, err := store.Matches(r.Context())
+	if err != nil {
+		errFixturesUnavailable(w)
+		return nil, fixtures.SyncState{}, false
+	}
+	state, err = store.SyncState(r.Context())
+	if err != nil {
+		errFixturesUnavailable(w)
+		return nil, fixtures.SyncState{}, false
+	}
+	return matches, state, true
+}
+
 type matchView struct {
 	HomeTeam     string
 	AwayTeam     string
@@ -91,12 +106,10 @@ type matchView struct {
 	KickoffUTC   string // machine-readable ISO 8601 UTC (the <time> datetime)
 	KickoffLabel string // human-readable UTC fallback shown until JS localises it
 	Venue        string
-	StageLabel   string // table stage column: group name, or stage for knockouts
-	StageURL     string // link to the group detail page; empty for knockouts
 	StageName    string // card top-left: always the stage label ("Group stage")
 	GroupName    string // card group pill: "Group A", empty for knockouts
 	GroupURL     string // card group pill link
-	Score        string // combined "2 – 1" for table views; empty until finished
+	Score        string // "2 – 1" once finished; used to derive AriaLabel (not rendered)
 	HomeGoals    string // card score: home goals, empty until finished
 	AwayGoals    string // card score: away goals
 	Pens         string // "4–2 pens" for a finished shootout, else empty
@@ -113,18 +126,12 @@ var stateLabels = map[fixtures.Status]string{
 
 func page(store fixtures.Store, host string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		matches, err := store.Matches(r.Context())
-		if err != nil {
-			errFixturesUnavailable(w)
-			return
-		}
-		state, err := store.SyncState(r.Context())
-		if err != nil {
-			errFixturesUnavailable(w)
+		matches, state, ok := loadFixtures(w, r, store)
+		if !ok {
 			return
 		}
 
-		data := pageData{FeedHost: host, AssetVersion: assetVersion, LastSyncedUTC: lastSynced(state), LastSyncedLabel: syncedLabel(state), Nav: buildNav(matches, host)}
+		data := pageData{AssetVersion: assetVersion, LastSyncedUTC: lastSynced(state), LastSyncedLabel: syncedLabel(state), Nav: buildNav(matches, host)}
 		data.Matches, data.HasVenues = buildViews(matches)
 
 		render(w, "index.html.tmpl", data)
@@ -175,15 +182,13 @@ func viewOf(m fixtures.Match) matchView {
 		KickoffUTC:   m.KickoffAt.UTC().Format(time.RFC3339),
 		KickoffLabel: utcLabel(m.KickoffAt),
 		Venue:        m.Venue,
-		StageLabel:   m.GroupName,
 		StageName:    m.Stage.Label(),
 		StatusLabel:  stateLabels[m.Status],
 		Live:         m.Status == fixtures.StatusInPlay,
 	}
-	if m.Stage != fixtures.StageGroup {
-		v.StageLabel = m.Stage.Label()
-	} else if letter, ok := strings.CutPrefix(m.GroupName, "Group "); ok {
-		v.StageURL = "/groups/" + letter
+	// Group-stage cards carry a pill linking to the group page; knockout
+	// cards (no group_name) carry none.
+	if letter, ok := strings.CutPrefix(m.GroupName, "Group "); ok && m.Stage == fixtures.StageGroup {
 		v.GroupName = m.GroupName
 		v.GroupURL = "/groups/" + letter
 	}
