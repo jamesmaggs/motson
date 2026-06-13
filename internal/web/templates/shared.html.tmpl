@@ -91,10 +91,12 @@
     /* The sidebar scrolls with the page so the full team list is reachable.
        Its background sits between the page (#11151a) and the cards (#1f2730). */
     .sidebar { flex: 0 0 260px; background: #181e26; border-radius: 12px; padding: .5rem 1rem 1rem; }
-    .sidebar-nav .nav-heading:first-child { margin-top: .5rem; }
-    .sidebar-nav .add-cal { color: #ffd23f; font-weight: 400; margin: .25rem 0 .5rem; justify-content: center; background: #1f2730; padding: .5rem .55rem; }
-    .sidebar-nav .add-cal:hover { background: #252e38; }
-    .sidebar-nav .cal-icon { width: .95rem; height: .95rem; flex: 0 0 auto; }
+    .sidebar-nav .nav-heading:first-child { margin-top: .25rem; }
+    /* Top row: the calendar button (and, on mobile, the menu toggle). */
+    .sidebar-top { display: flex; gap: .5rem; align-items: stretch; margin-bottom: .6rem; }
+    .sidebar .add-cal { flex: 1; display: flex; align-items: center; justify-content: center; gap: .25rem; color: #ffd23f; text-decoration: none; font-size: .68rem; font-weight: 400; line-height: 1.4; background: #1f2730; padding: .5rem .55rem; border-radius: 8px; }
+    .sidebar .add-cal:hover { background: #252e38; }
+    .sidebar .cal-icon { width: .95rem; height: .95rem; flex: 0 0 auto; }
     .sidebar-nav .nav-heading { text-transform: uppercase; font-size: .66rem; letter-spacing: .1em; color: #8d97a3; margin: 1.4rem 0 .5rem; }
     .sidebar-nav ul { list-style: none; padding: 0; margin: 0; }
     .sidebar-nav li { margin: .1rem 0; }
@@ -107,10 +109,22 @@
     /* Fixed-width flag box so group names (whose flag slot is empty)
        line up with team names. */
     .sidebar .flag { font-size: 1.15rem; line-height: 1; text-align: center; flex: 0 0 1.8rem; min-width: 0; }
+    /* Collapse toggle: hidden on desktop, the menu is always shown. */
+    .nav-toggle { display: none; }
     @media (max-width: 720px) {
       .layout { flex-direction: column; padding: 1rem; }
       .sidebar { position: static; flex-basis: auto; width: 100%; }
       .sidebar-nav .nav-teams { columns: 2; }
+      /* margin:0 removes Pico's button margin, whose margin-box would
+         otherwise inflate the flex row and stretch the calendar button. */
+      .nav-toggle { flex: 1; margin: 0; display: inline-flex; align-items: center; justify-content: center; gap: .25rem; background: #1f2730; color: #e8e6e3; border: 0; border-radius: 8px; padding: 1rem .55rem; font-family: inherit; font-size: .68rem; line-height: 1.4; cursor: pointer; }
+      .nav-toggle .burger { width: .95rem; height: .95rem; }
+      .sidebar .add-cal { padding: 1rem .55rem; }
+      /* Animate open/close by transitioning the collapse to its
+         content height (grid-template-rows 0fr -> 1fr). */
+      .nav-collapse { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .3s ease; }
+      .nav-collapse > .sidebar-nav { overflow: hidden; min-height: 0; }
+      .sidebar.nav-open .nav-collapse { grid-template-rows: 1fr; margin-top: .7rem; }
     }
   </style>
 </head>
@@ -127,8 +141,15 @@
 
 {{define "sidebar"}}
     <aside class="sidebar">
-      <nav class="sidebar-nav">
+      <div class="sidebar-top">
+        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="sidebar-nav">
+          <svg class="burger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+          Menu
+        </button>
         <a class="add-cal" href="webcal://{{.FeedHost}}/calendar.ics"><svg class="cal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Add to Calendar</a>
+      </div>
+      <div class="nav-collapse">
+      <nav class="sidebar-nav" id="sidebar-nav">
         <p class="nav-heading">Groups</p>
         <div class="nav-group-grid">
           {{range .Groups}}<a class="group-badge" href="{{.URL}}">{{.Letter}}</a>{{end}}
@@ -138,6 +159,7 @@
           {{range .Teams}}<li><a href="{{.URL}}">{{if .Flag}}<span class="flag">{{.Flag}}</span>{{end}}{{.Name}}</a></li>{{end}}
         </ul>
       </nav>
+      </div>
     </aside>
 {{end}}
 
@@ -193,6 +215,14 @@
           hour: "2-digit", minute: "2-digit"
         });
       }
+    }
+    const navToggle = document.querySelector(".nav-toggle");
+    if (navToggle) {
+      navToggle.addEventListener("click", () => {
+        const sidebar = navToggle.closest(".sidebar");
+        const open = sidebar.classList.toggle("nav-open");
+        navToggle.setAttribute("aria-expanded", open ? "true" : "false");
+      });
     }
   </script>
 {{end}}

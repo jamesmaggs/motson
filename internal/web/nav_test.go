@@ -60,6 +60,22 @@ func TestSidebarHasAddToCalendar(t *testing.T) {
 	}
 }
 
+// The sidebar has a collapse toggle (for small screens) that starts
+// collapsed and controls the nav.
+func TestSidebarHasCollapseToggle(t *testing.T) {
+	body := get(t, navSpread(t), now, "/").Body.String()
+
+	if !strings.Contains(body, `class="nav-toggle"`) {
+		t.Errorf("menu toggle button missing")
+	}
+	if !strings.Contains(body, `aria-controls="sidebar-nav"`) || !strings.Contains(body, `id="sidebar-nav"`) {
+		t.Errorf("toggle does not control the nav by id")
+	}
+	if !strings.Contains(body, `aria-expanded="false"`) {
+		t.Errorf("menu should start collapsed (aria-expanded=false)")
+	}
+}
+
 // Sidebar teams are alphabetical and unnamed sides are excluded.
 func TestSidebarTeamsAlphabeticalAndNamed(t *testing.T) {
 	tbc := withID(match("wc-final"), "wc-final")
