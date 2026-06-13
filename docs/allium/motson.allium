@@ -321,6 +321,7 @@ surface GroupDetailPage {
         -- Matches use the same card layout as FixturesPage: each team
         -- appears with its national flag alongside its name, and a
         -- name that does not identify a nation renders without a flag.
+        -- The standings list each team with its flag too.
 
     @guarantee TeamNamesLink
         -- Team names in the standings and the fixtures list link to

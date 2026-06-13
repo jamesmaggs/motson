@@ -61,6 +61,10 @@ func TestGroupDetailMatchesAreCardsAndTableIsCarded(t *testing.T) {
 	if !strings.Contains(body, `class="standings-card"`) {
 		t.Errorf("standings should sit in a card container: %s", body)
 	}
+	// Standings list each team with its national flag beside the name.
+	if !strings.Contains(body, `<a href="/teams/canada"><span class="flag">🇨🇦</span> Canada</a>`) {
+		t.Errorf("standings row should carry the team flag: %s", body)
+	}
 	// The group's own page does not repeat the redundant "Group A" pill
 	// on each card (it links to the page you're already on).
 	if strings.Contains(mainContent(body), `class="group"`) {

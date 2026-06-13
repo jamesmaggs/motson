@@ -114,16 +114,19 @@
        DOM order is standings-then-matches (the source order the spec
        mandates); the grid places matches left and the table right on
        wide screens. When stacked, DOM order brings the table first. */
-    .group-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 360px); gap: 1rem; align-items: start; }
+    /* Two equal columns so the standings card is exactly the width of a
+       match card. Matches force a single column to guarantee that. */
+    .group-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: start; }
     .match-col { grid-column: 1; grid-row: 1; }
     .standings-col { grid-column: 2; grid-row: 1; }
-    .col-head { margin-top: 0; }
-    .group-cols .cards { margin: 0; }
+    .group-cols .cards { margin: 0; grid-template-columns: 1fr; }
     /* Standings in a card container matching the match cards. */
-    .standings-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: .25rem 1rem; }
-    .standings-card table { margin: 0; font-size: .8em; }
-    .standings-card th, .standings-card td { text-align: center; padding: .5rem .2rem; }
+    .standings-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1rem 1.1rem; }
+    .standings-title { margin: 0 0 .6rem; font-size: 1.5rem; }
+    .standings-card table { margin: 0; font-size: .82em; }
+    .standings-card th, .standings-card td { text-align: center; padding: .5rem .25rem; }
     .standings-card th:first-child, .standings-card td:first-child { text-align: left; }
+    .standings-card .flag { font-size: 1.05em; }
     .standings-card td.points { font-weight: 700; color: var(--ink); }
     .standings-card tbody tr:last-child td { border-bottom: 0; }
 
@@ -274,7 +277,7 @@
       <tbody>
         {{range .}}
         <tr>
-          <td>{{if .URL}}<a href="{{.URL}}">{{.Team}}</a>{{else}}{{.Team}}{{end}}</td>
+          <td>{{if .URL}}<a href="{{.URL}}">{{if .Flag}}<span class="flag">{{.Flag}}</span> {{end}}{{.Team}}</a>{{else}}{{if .Flag}}<span class="flag">{{.Flag}}</span> {{end}}{{.Team}}{{end}}</td>
           <td>{{.Played}}</td>
           <td>{{.Won}}</td>
           <td>{{.Drawn}}</td>

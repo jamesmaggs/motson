@@ -92,7 +92,7 @@ func TestTeamNamesLinkEverywhere(t *testing.T) {
 	}
 
 	groupPage := get(t, st, now, "/groups/A").Body.String()
-	if !strings.Contains(groupPage, `<a href="/teams/mexico">Mexico</a>`) {
-		t.Errorf("group standings missing team link: %s", groupPage)
+	if !strings.Contains(groupPage, `<a href="/teams/mexico"><span class="flag">🇲🇽</span> Mexico</a>`) {
+		t.Errorf("group standings missing flagged team link: %s", groupPage)
 	}
 }

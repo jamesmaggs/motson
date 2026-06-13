@@ -8,16 +8,17 @@ import (
 
 type standingRow struct {
 	fixtures.GroupStanding
-	URL string
+	URL  string
+	Flag string
 }
 
 // standingRows computes a group's standings with team-page links
-// (TeamNamesLink guarantee).
+// (TeamNamesLink guarantee) and national flags.
 func standingRows(groupMatches []fixtures.Match) []standingRow {
 	standings := fixtures.Standings(groupMatches)
 	rows := make([]standingRow, len(standings))
 	for i, s := range standings {
-		rows[i] = standingRow{GroupStanding: s, URL: teamURL(s.Team)}
+		rows[i] = standingRow{GroupStanding: s, URL: teamURL(s.Team), Flag: flagFor(s.Team)}
 	}
 	return rows
 }
