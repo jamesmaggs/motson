@@ -7,28 +7,7 @@
     {{template "sidebar" .Nav}}
     <main class="content" id="main" tabindex="-1">
     <div class="cards">
-      {{range .Matches}}
-      <article class="card{{if .Live}} live{{end}}" aria-label="{{.AriaLabel}}">
-        <div class="card-top">
-          <div class="meta">
-            <span class="stage">{{.StageName}}</span>
-            {{if .Live}}<span class="live-badge"><span class="live-dot"></span>LIVE</span>{{else}}<time class="kickoff" datetime="{{.KickoffUTC}}">{{.KickoffUTC}}</time>{{end}}
-          </div>
-          {{if .GroupName}}<a class="group" href="{{.GroupURL}}">{{.GroupName}}</a>{{end}}
-        </div>
-        <div class="scoreline">
-          <div class="side">
-            {{if .HomeURL}}<a class="team" href="{{.HomeURL}}"><span class="flag">{{.HomeFlag}}</span><span class="name">{{.HomeTeam}}</span></a>{{else}}<span class="flag">{{.HomeFlag}}</span><span class="name">{{.HomeTeam}}</span>{{end}}
-          </div>
-          {{if .HomeGoals}}<div class="score">{{.HomeGoals}}<span class="sep">:</span>{{.AwayGoals}}{{if .Pens}}<span class="pens">{{.Pens}}</span>{{end}}</div>{{else}}<div class="vs">vs</div>{{end}}
-          <div class="side">
-            {{if .AwayURL}}<a class="team" href="{{.AwayURL}}"><span class="flag">{{.AwayFlag}}</span><span class="name">{{.AwayTeam}}</span></a>{{else}}<span class="flag">{{.AwayFlag}}</span><span class="name">{{.AwayTeam}}</span>{{end}}
-          </div>
-        </div>
-        {{if .Venue}}<div class="venue">{{.Venue}}</div>{{end}}
-        {{if and .StatusLabel (not .Live)}}<div class="status">{{.StatusLabel}}</div>{{end}}
-      </article>
-      {{end}}
+      {{range .Matches}}{{template "matchCard" .}}{{end}}
     </div>
 {{template "footer" .}}
 </body>

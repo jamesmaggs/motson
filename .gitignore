@@ -10,3 +10,4 @@
 # Local styling previews (never shipped)
 preview/
 tools/preview/
+tools/serve/

@@ -69,6 +69,14 @@ func groupDetail(store fixtures.Store, host string) http.HandlerFunc {
 			Nav:           buildNav(matches, host),
 		}
 		data.Matches, data.HasVenues = buildViews(group)
+		// On a group's own page the group is implied, so drop the
+		// self-referential group pill from each card (as knockout cards
+		// carry none). The accessible label, computed in viewOf, keeps
+		// the group context.
+		for i := range data.Matches {
+			data.Matches[i].GroupName = ""
+			data.Matches[i].GroupURL = ""
+		}
 
 		render(w, "groupdetail.html.tmpl", data)
 	}

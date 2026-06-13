@@ -110,6 +110,23 @@
     .venue { text-align: center; color: var(--muted); font-size: .72rem; margin-top: .9rem; }
     .status { text-align: center; color: var(--muted); font-size: .72rem; margin-top: .9rem; }
 
+    /* Group page: three columns — menu (sidebar) | matches | standings.
+       DOM order is standings-then-matches (the source order the spec
+       mandates); the grid places matches left and the table right on
+       wide screens. When stacked, DOM order brings the table first. */
+    .group-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 360px); gap: 1rem; align-items: start; }
+    .match-col { grid-column: 1; grid-row: 1; }
+    .standings-col { grid-column: 2; grid-row: 1; }
+    .col-head { margin-top: 0; }
+    .group-cols .cards { margin: 0; }
+    /* Standings in a card container matching the match cards. */
+    .standings-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: .25rem 1rem; }
+    .standings-card table { margin: 0; font-size: .8em; }
+    .standings-card th, .standings-card td { text-align: center; padding: .5rem .2rem; }
+    .standings-card th:first-child, .standings-card td:first-child { text-align: left; }
+    .standings-card td.points { font-weight: 700; color: var(--ink); }
+    .standings-card tbody tr:last-child td { border-bottom: 0; }
+
     /* Full-width site header above a two-column layout. The mascot is
        sized in rem so it scales with the header's type, and sits flush
        against the bottom border on the right. */
@@ -173,6 +190,10 @@
       .nav-collapse { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .3s ease; }
       .nav-collapse > .sidebar-nav { overflow: hidden; min-height: 0; }
       .sidebar.nav-open .nav-collapse { grid-template-rows: 1fr; margin-top: .6rem; }
+      /* Group page stacks to one column; DOM order (standings then
+         matches) puts the table first, as requested. */
+      .group-cols { grid-template-columns: 1fr; gap: 1.5rem; }
+      .match-col, .standings-col { grid-column: auto; grid-row: auto; }
     }
   </style>
 </head>
@@ -220,6 +241,29 @@
             {{if .StatusLabel}}<br><small class="state">{{.StatusLabel}}</small>{{end}}
           </td>
           <td class="away">{{if .AwayURL}}<a href="{{.AwayURL}}">{{if .AwayFlag}}{{.AwayFlag}} {{end}}{{.AwayTeam}}</a>{{else}}{{if .AwayFlag}}{{.AwayFlag}} {{end}}{{.AwayTeam}}{{end}}</td>
+{{end}}
+
+{{define "matchCard"}}
+      <article class="card{{if .Live}} live{{end}}" aria-label="{{.AriaLabel}}">
+        <div class="card-top">
+          <div class="meta">
+            <span class="stage">{{.StageName}}</span>
+            {{if .Live}}<span class="live-badge"><span class="live-dot"></span>LIVE</span>{{else}}<time class="kickoff" datetime="{{.KickoffUTC}}">{{.KickoffUTC}}</time>{{end}}
+          </div>
+          {{if .GroupName}}<a class="group" href="{{.GroupURL}}">{{.GroupName}}</a>{{end}}
+        </div>
+        <div class="scoreline">
+          <div class="side">
+            {{if .HomeURL}}<a class="team" href="{{.HomeURL}}"><span class="flag">{{.HomeFlag}}</span><span class="name">{{.HomeTeam}}</span></a>{{else}}<span class="flag">{{.HomeFlag}}</span><span class="name">{{.HomeTeam}}</span>{{end}}
+          </div>
+          {{if .HomeGoals}}<div class="score">{{.HomeGoals}}<span class="sep">:</span>{{.AwayGoals}}{{if .Pens}}<span class="pens">{{.Pens}}</span>{{end}}</div>{{else}}<div class="vs">vs</div>{{end}}
+          <div class="side">
+            {{if .AwayURL}}<a class="team" href="{{.AwayURL}}"><span class="flag">{{.AwayFlag}}</span><span class="name">{{.AwayTeam}}</span></a>{{else}}<span class="flag">{{.AwayFlag}}</span><span class="name">{{.AwayTeam}}</span>{{end}}
+          </div>
+        </div>
+        {{if .Venue}}<div class="venue">{{.Venue}}</div>{{end}}
+        {{if and .StatusLabel (not .Live)}}<div class="status">{{.StatusLabel}}</div>{{end}}
+      </article>
 {{end}}
 
 {{define "standingsTable"}}

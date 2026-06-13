@@ -303,9 +303,9 @@ surface GroupDetailPage {
     @guarantee OnePagePerGroup
         -- One instance of this surface exists per group (A through
         -- L). An instance exposes only its own group's standings and
-        -- matches: the standings table first, the group's results
-        -- and fixtures below it in kickoff order. Requests for a
-        -- group that does not exist are refused as not found.
+        -- matches: the standings table first in reading order, then
+        -- the group's results and fixtures in kickoff order. Requests
+        -- for a group that does not exist are refused as not found.
 
     @guarantee StandingsOrder
         -- Standings rank by points, then goal difference, then goals
@@ -318,8 +318,9 @@ surface GroupDetailPage {
         -- The page requires no authentication.
 
     @guarantee TeamFlags
-        -- Same reading order as FixturesPage in the fixtures list:
-        -- home name, home flag, score, away flag, away name.
+        -- Matches use the same card layout as FixturesPage: each team
+        -- appears with its national flag alongside its name, and a
+        -- name that does not identify a nation renders without a flag.
 
     @guarantee TeamNamesLink
         -- Team names in the standings and the fixtures list link to
@@ -328,7 +329,11 @@ surface GroupDetailPage {
     @guidance
         -- Reached from the stage entries of FixturesPage (each
         -- "Group X" stage label links to its group's page) and
-        -- addressed by group letter (e.g. /groups/A).
+        -- addressed by group letter (e.g. /groups/A). Presented with
+        -- the same chrome as FixturesPage: the navigation menu, the
+        -- group's matches as cards, and the standings in a matching
+        -- card. On wide screens these form three columns (menu,
+        -- matches, table); when stacked, the table leads.
 
     related:
         FixturesPage(schedule)
