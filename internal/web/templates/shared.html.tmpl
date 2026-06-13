@@ -112,7 +112,9 @@
     /* Collapse toggle: hidden on desktop, the menu is always shown. */
     .nav-toggle { display: none; }
     @media (max-width: 720px) {
-      .layout { flex-direction: column; padding: 1rem; }
+      /* Stacked: stretch so the sidebar and cards span the full width
+         (the base align-items:flex-start is for the desktop columns). */
+      .layout { flex-direction: column; align-items: stretch; padding: 1rem; }
       /* Uniform spacing around the top buttons: panel inset, the gap
          between them, and the space below all equal. */
       .sidebar { position: static; flex-basis: auto; width: 100%; padding: .6rem; }
