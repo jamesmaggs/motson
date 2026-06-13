@@ -124,10 +124,13 @@
     .standings-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1rem 1.1rem; }
     .standings-title { margin: 0 0 .6rem; font-size: 1.5rem; }
     .standings-card table { margin: 0; font-size: .82em; }
-    .standings-card th, .standings-card td { text-align: center; padding: .5rem .25rem; }
-    .standings-card th:first-child, .standings-card td:first-child { text-align: left; }
+    .standings-card th, .standings-card td { text-align: center; padding: .55rem .35rem; }
+    /* Extra breathing room between the team names and the figures. */
+    .standings-card th:first-child, .standings-card td:first-child { text-align: left; padding-right: 1.5rem; }
     .standings-card .flag { font-size: 1.05em; }
     .standings-card td.points { font-weight: 700; color: var(--ink); }
+    /* Faint divider between rows. */
+    .standings-card tbody td { border-bottom: 1px solid var(--border-soft); }
     .standings-card tbody tr:last-child td { border-bottom: 0; }
 
     /* Full-width site header above a two-column layout. The mascot is
@@ -272,7 +275,7 @@
 {{define "standingsTable"}}
     <table>
       <thead>
-        <tr><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th></tr>
+        <tr><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th></tr>
       </thead>
       <tbody>
         {{range .}}
@@ -282,8 +285,6 @@
           <td>{{.Won}}</td>
           <td>{{.Drawn}}</td>
           <td>{{.Lost}}</td>
-          <td>{{.GoalsFor}}</td>
-          <td>{{.GoalsAgainst}}</td>
           <td>{{.GoalDifference}}</td>
           <td class="points">{{.Points}}</td>
         </tr>
