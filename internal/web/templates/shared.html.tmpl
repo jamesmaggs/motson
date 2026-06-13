@@ -116,7 +116,10 @@
       /* Uniform spacing around the top buttons: panel inset, the gap
          between them, and the space below all equal. */
       .sidebar { position: static; flex-basis: auto; width: 100%; padding: .6rem; }
-      .sidebar-top { gap: .6rem; margin-bottom: .6rem; }
+      /* No margin below the buttons: when collapsed, the space below
+         is just the panel's .6rem padding, matching the other sides.
+         When open, the menu adds its own .6rem top separation. */
+      .sidebar-top { gap: .6rem; margin-bottom: 0; }
       .sidebar-nav .nav-teams { columns: 2; }
       /* margin:0 removes Pico's button margin, whose margin-box would
          otherwise inflate the flex row and stretch the calendar button. */
@@ -127,7 +130,7 @@
          content height (grid-template-rows 0fr -> 1fr). */
       .nav-collapse { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .3s ease; }
       .nav-collapse > .sidebar-nav { overflow: hidden; min-height: 0; }
-      .sidebar.nav-open .nav-collapse { grid-template-rows: 1fr; margin-top: .7rem; }
+      .sidebar.nav-open .nav-collapse { grid-template-rows: 1fr; margin-top: .6rem; }
     }
   </style>
 </head>
