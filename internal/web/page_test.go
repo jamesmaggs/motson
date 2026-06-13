@@ -150,10 +150,12 @@ func TestUnnamedTeamsRenderAsTBC(t *testing.T) {
 	m.HomeTeam, m.AwayTeam = "", ""
 
 	body := get(t, seeded(t, m), now, "/").Body.String()
-	if got := strings.Count(body, "TBC"); got != 2 {
-		t.Errorf("got %d TBC placeholders, want 2: %s", got, body)
+	if got := strings.Count(body, `<span class="name">TBC</span>`); got != 2 {
+		t.Errorf("got %d visible TBC placeholders, want 2: %s", got, body)
 	}
-	for _, r := range body {
+	// No flag emoji in the visible card body (ignore the aria-label text).
+	main := mainContent(body)
+	for _, r := range main {
 		if r >= 0x1F1E6 && r <= 0x1F1FF {
 			t.Error("TBC side must not carry a flag")
 			break

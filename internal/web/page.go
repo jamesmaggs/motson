@@ -62,7 +62,8 @@ type matchView struct {
 	AwayGoals   string // card score: away goals
 	Pens        string // "4–2 pens" for a finished shootout, else empty
 	StatusLabel string // "In play", "Postponed", "Cancelled" or empty
-	Live        bool   // match in progress — cards glow instead of labelling
+	Live        bool   // match in progress — shown with a LIVE badge
+	AriaLabel   string // accessible name summarising the card for screen readers
 }
 
 var stateLabels = map[fixtures.Status]string{
@@ -154,5 +155,35 @@ func viewOf(m fixtures.Match) matchView {
 			v.Pens = fmt.Sprintf("%d–%d pens", *m.HomePenalties, *m.AwayPenalties)
 		}
 	}
+	v.AriaLabel = ariaLabel(m, v)
 	return v
+}
+
+// ariaLabel is a concise accessible name for a match card, so screen
+// reader users get a one-line summary instead of an unlabelled article.
+func ariaLabel(m fixtures.Match, v matchView) string {
+	middle := "versus"
+	if v.Score != "" {
+		middle = strings.ReplaceAll(v.Score, "–", "to") // "2 to 1"
+	}
+	label := fmt.Sprintf("%s %s %s", v.HomeTeam, middle, v.AwayTeam)
+	if v.Pens != "" {
+		label += ", " + strings.Replace(v.Pens, "–", " to ", 1)
+	}
+	context := m.Stage.Label()
+	if v.GroupName != "" {
+		context = v.GroupName
+	}
+	label += ", " + context
+	switch {
+	case v.Live:
+		label += ", in progress"
+	case m.Status == fixtures.StatusFinished:
+		label += ", full time"
+	case m.Status == fixtures.StatusPostponed:
+		label += ", postponed"
+	case m.Status == fixtures.StatusCancelled:
+		label += ", cancelled"
+	}
+	return label
 }

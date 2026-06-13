@@ -5,10 +5,10 @@
   {{template "siteheader" .}}
   <div class="layout">
     {{template "sidebar" .Nav}}
-    <main class="content">
+    <main class="content" id="main" tabindex="-1">
     <div class="cards">
       {{range .Matches}}
-      <article class="card{{if .Live}} live{{end}}">
+      <article class="card{{if .Live}} live{{end}}" aria-label="{{.AriaLabel}}">
         <div class="card-top">
           <div class="meta">
             <span class="stage">{{.StageName}}</span>

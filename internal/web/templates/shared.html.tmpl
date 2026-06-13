@@ -8,16 +8,41 @@
   <link rel="stylesheet" href="/static/fonts.css?v={{.AssetVersion}}">
   <link rel="alternate" type="text/calendar" title="World Cup 2026 calendar" href="/calendar.ics">
   <style>
+    :root {
+      --bg: #11151a;            /* page background */
+      --surface: #1f2730;       /* cards, buttons */
+      --surface-2: #181e26;     /* sidebar panel */
+      --row-hover: #171c22;     /* table row hover */
+      --btn-hover: #252e38;     /* button hover */
+      --border: #2a333d;        /* card border */
+      --border-soft: #232a32;   /* header / table borders */
+      --border-line: #2a313a;   /* table heading underline */
+      --ink: #e8e6e3;           /* body text */
+      --muted: #8d97a3;         /* secondary text (AA on surface) */
+      --accent: #ffd23f;        /* amber: scores, links, focus */
+      --accent-rgb: 255, 210, 63;
+      --green: #2fbf71;         /* live dot */
+      --green-text: #5fd99a;    /* group pill / badge text */
+      --green-bright: #6ee0a6;  /* LIVE badge */
+      --green-rgb: 47, 191, 113;
+    }
     /* Floodlit scoreboard: dark night-match chrome, amber scores,
        Bebas Neue title over Inter data. */
-    html { background: #11151a; }
-    body { background: #11151a; color: #e8e6e3; font-family: Inter, -apple-system, system-ui, sans-serif; min-height: 100vh; }
-    main h1, main h2, main p, main th, main td, footer p { color: #e8e6e3; }
+    html { background: var(--bg); }
+    body { background: var(--bg); color: var(--ink); font-family: Inter, -apple-system, system-ui, sans-serif; min-height: 100vh; }
+    /* Visible keyboard focus on every interactive element (links here
+       drop their underline, so the browser default isn't enough). */
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+    main:focus { outline: none; }
+    /* Skip link: hidden until focused, then jumps past the nav. */
+    .skip-link { position: absolute; left: 0; top: -3rem; z-index: 50; margin: .5rem; padding: .5rem .8rem; background: var(--surface); color: var(--accent); border-radius: 8px; text-decoration: none; font-size: .85rem; }
+    .skip-link:focus { top: 0; }
+    main h1, main h2, main p, main th, main td, footer p { color: var(--ink); }
     h1 { color: #fff; font-family: "Bebas Neue", Inter, sans-serif; font-weight: 400; font-size: 3rem; letter-spacing: .06em; }
     h2 { color: #fff; font-family: "Bebas Neue", Inter, sans-serif; font-weight: 400; font-size: 1.6rem; letter-spacing: .06em; margin: 2.5rem 0 0; }
     table { --pico-background-color: transparent; font-size: .85em; margin-top: 2.5rem; margin-bottom: 2.5rem; }
     h2 + table { margin-top: .75rem; }
-    h3 { color: #8d97a3; font-family: "Bebas Neue", Inter, sans-serif; font-weight: 400; font-size: 1.1rem; letter-spacing: .08em; margin: 2rem 0 0; }
+    h3 { color: var(--muted); font-family: "Bebas Neue", Inter, sans-serif; font-weight: 400; font-size: 1.1rem; letter-spacing: .08em; margin: 2rem 0 0; }
     h3 + table { margin-top: .75rem; }
     h3 a { color: inherit; text-decoration: none; }
     h3 a:hover { text-decoration: underline; }
@@ -31,18 +56,18 @@
     col.c-side { width: 31%; }
     col.c-score { width: 14%; }
     tbody td { font-weight: 300; }
-    thead th { color: #8d97a3; border-bottom: 2px solid #2a313a; text-transform: uppercase; font-size: .8em; letter-spacing: .08em; }
+    thead th { color: var(--muted); border-bottom: 2px solid var(--border-line); text-transform: uppercase; font-size: .8em; letter-spacing: .08em; }
     thead th.match { text-align: center; }
-    tbody td { border-color: #232a32; }
-    tbody tr:hover { background: #171c22; }
-    a { color: #ffd23f; }
+    tbody td { border-color: var(--border-soft); }
+    tbody tr:hover { background: var(--row-hover); }
+    a { color: var(--accent); }
     tbody td a, h2 a { color: inherit; text-decoration: none; }
     tbody td a:hover, h2 a:hover { text-decoration: underline; }
     .fixture td:first-child { white-space: nowrap; }
     td.home { text-align: right; }
-    td.score { text-align: center; font-weight: 700; font-size: 1.15em; white-space: nowrap; color: #ffd23f; font-variant-numeric: tabular-nums; text-shadow: 0 0 12px rgba(255, 210, 63, .35); }
+    td.score { text-align: center; font-weight: 700; font-size: 1.15em; white-space: nowrap; color: var(--accent); font-variant-numeric: tabular-nums; text-shadow: 0 0 12px rgba(var(--accent-rgb), .35); }
     td.away { text-align: left; }
-    .state { color: #8d97a3; font-weight: 400; text-shadow: none; }
+    .state { color: var(--muted); font-weight: 400; text-shadow: none; }
     td.score .state { font-size: .7em; }
     footer p { font-size: .75em; }
 
@@ -51,21 +76,20 @@
        via the default stretch); avoids stretching every card to the
        tallest in the whole grid, which left unplayed cards half-empty. */
     .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; margin: 0 0 2.5rem; }
-    .card { display: flex; flex-direction: column; justify-content: center; background: #1f2730; border: 1px solid #2a333d; border-radius: 16px; padding: 1rem 1.1rem; box-shadow: none; margin: 0; }
-    /* In-progress matches glow green (group-pill tone). */
+    .card { display: flex; flex-direction: column; justify-content: center; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1rem 1.1rem; box-shadow: none; margin: 0; }
     /* In-progress: a LIVE badge (text, not colour alone) + a brighter
        border. No box-shadow glow. */
-    .card.live { border-color: rgba(47,191,113,.55); }
-    .live-badge { display: inline-flex; align-items: center; gap: .4rem; color: #6ee0a6; font-size: .72rem; font-weight: 600; letter-spacing: .06em; }
-    .live-dot { width: .45rem; height: .45rem; border-radius: 50%; background: #2fbf71; animation: live-pulse 1.6s ease-in-out infinite; }
+    .card.live { border-color: rgba(var(--green-rgb),.55); }
+    .live-badge { display: inline-flex; align-items: center; gap: .4rem; color: var(--green-bright); font-size: .72rem; font-weight: 600; letter-spacing: .06em; }
+    .live-dot { width: .45rem; height: .45rem; border-radius: 50%; background: var(--green); animation: live-pulse 1.6s ease-in-out infinite; }
     @keyframes live-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
     @media (prefers-reduced-motion: reduce) { .live-dot { animation: none; } }
     .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: .5rem; margin-bottom: 1rem; }
     .meta { display: flex; flex-direction: column; gap: .25rem; }
-    .stage { text-transform: uppercase; font-size: .62rem; letter-spacing: .1em; color: #8d97a3; }
-    .kickoff { color: #e8e6e3; font-size: .72rem; }
-    .group { font-size: .72rem; padding: .2rem .65rem; border-radius: 999px; background: rgba(47,191,113,.16); color: #5fd99a; white-space: nowrap; text-decoration: none; }
-    .group:hover { background: rgba(47,191,113,.28); }
+    .stage { text-transform: uppercase; font-size: .62rem; letter-spacing: .1em; color: var(--muted); }
+    .kickoff { color: var(--ink); font-size: .72rem; }
+    .group { font-size: .72rem; padding: .2rem .65rem; border-radius: 999px; background: rgba(var(--green-rgb),.16); color: var(--green-text); white-space: nowrap; text-decoration: none; }
+    .group:hover { background: rgba(var(--green-rgb),.28); }
     .scoreline { display: grid; grid-template-columns: 1fr auto 1fr; align-items: start; gap: .5rem; }
     .side { text-align: center; }
     .side .flag { font-size: 2.8rem; line-height: 1; }
@@ -73,12 +97,12 @@
     /* Flag + name share one link to the team page. */
     .side .team { display: block; color: inherit; text-decoration: none; }
     .side .team:hover .name { text-decoration: underline; }
-    .score { font-size: 2rem; font-weight: 700; color: #ffd23f; font-variant-numeric: tabular-nums; white-space: nowrap; padding-top: .5rem; }
-    .score .sep { margin: 0 .3rem; color: #79838e; font-weight: 400; }
-    .vs { font-size: 1.1rem; color: #8d97a3; padding-top: .9rem; }
-    .pens { display: block; font-size: .68rem; font-weight: 400; color: #79838e; margin-top: .2rem; }
-    .venue { text-align: center; color: #79838e; font-size: .72rem; margin-top: .9rem; }
-    .status { text-align: center; color: #79838e; font-size: .72rem; margin-top: .9rem; }
+    .score { font-size: 2rem; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; white-space: nowrap; padding-top: .5rem; }
+    .score .sep { margin: 0 .3rem; color: var(--muted); font-weight: 400; }
+    .vs { font-size: 1.1rem; color: var(--muted); padding-top: .9rem; }
+    .pens { display: block; font-size: .68rem; font-weight: 400; color: var(--muted); margin-top: .2rem; }
+    .venue { text-align: center; color: var(--muted); font-size: .72rem; margin-top: .9rem; }
+    .status { text-align: center; color: var(--muted); font-size: .72rem; margin-top: .9rem; }
 
     /* Full-width site header above a two-column layout. The mascot is
        sized in rem so it scales with the header's type, and sits flush
@@ -86,36 +110,36 @@
     /* Sticky header: the page scrolls up behind it. Opaque background
        hides the content passing beneath; a subtle glow sits below the
        border. Pico's body>header padding-block is reset. */
-    .site-header { position: sticky; top: 0; z-index: 10; background: #11151a; padding: 0; }
+    .site-header { position: sticky; top: 0; z-index: 10; background: var(--bg); padding: 0; }
     .site-header-inner { position: relative; display: flex; justify-content: space-between; align-items: flex-end; max-width: 1180px; margin: 0 auto; padding: 1.2rem 1.5rem 0; }
     /* Bottom border as a gradient: solid under the mascot, fading out
        on either side of it. */
-    .site-header-inner::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: linear-gradient(to right, transparent 70%, #232a32 87%, #232a32 96%, transparent 100%); }
+    .site-header-inner::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: linear-gradient(to right, transparent 70%, var(--border-soft) 87%, var(--border-soft) 96%, transparent 100%); }
     .site-header h1 { margin: 0 0 1.2rem; }
     .site-header h1 a { color: inherit; text-decoration: none; }
     .site-header .mascot { height: 6rem; width: auto; display: block; }
     .layout { display: flex; gap: 1rem; max-width: 1180px; margin: 0 auto; padding: 1.5rem; align-items: flex-start; }
     .content { flex: 1 1 auto; min-width: 0; }
-    .content .intro { margin-top: 0; color: #8d97a3; }
+    .content .intro { margin-top: 0; color: var(--muted); }
     .content .subscribe { margin-top: 0; }
     /* The sidebar scrolls with the page so the full team list is reachable.
-       Its background sits between the page (#11151a) and the cards (#1f2730). */
-    .sidebar { flex: 0 0 260px; background: #181e26; border-radius: 12px; padding: .5rem 1rem 1rem; }
+       Its background sits between the page (var(--bg)) and the cards (var(--surface)). */
+    .sidebar { flex: 0 0 260px; background: var(--surface-2); border-radius: 12px; padding: .5rem 1rem 1rem; }
     .sidebar-nav .nav-heading:first-child { margin-top: .25rem; }
     /* Top row: the calendar button (and, on mobile, the menu toggle). */
     .sidebar-top { display: flex; gap: .5rem; align-items: stretch; margin-bottom: .6rem; }
-    .sidebar .add-cal { flex: 1; display: flex; align-items: center; justify-content: center; gap: .25rem; color: #ffd23f; text-decoration: none; font-size: .68rem; font-weight: 400; line-height: 1.4; background: #1f2730; padding: .5rem .55rem; border-radius: 8px; }
-    .sidebar .add-cal:hover { background: #252e38; }
+    .sidebar .add-cal { flex: 1; display: flex; align-items: center; justify-content: center; gap: .25rem; color: var(--accent); text-decoration: none; font-size: .68rem; font-weight: 400; line-height: 1.4; background: var(--surface); padding: .5rem .55rem; border-radius: 8px; }
+    .sidebar .add-cal:hover { background: var(--btn-hover); }
     .sidebar .cal-icon { width: .95rem; height: .95rem; flex: 0 0 auto; }
-    .sidebar-nav .nav-heading { text-transform: uppercase; font-size: .66rem; letter-spacing: .1em; color: #8d97a3; margin: 1.4rem 0 .5rem; }
+    .sidebar-nav .nav-heading { text-transform: uppercase; font-size: .66rem; letter-spacing: .1em; color: var(--muted); margin: 1.4rem 0 .5rem; }
     .sidebar-nav ul { list-style: none; padding: 0; margin: 0; }
     .sidebar-nav li { margin: .1rem 0; }
-    .sidebar-nav a { display: flex; align-items: center; gap: .25rem; color: #e8e6e3; text-decoration: none; font-size: .68rem; font-weight: 300; padding: .25rem .55rem; border-radius: 8px; }
-    .sidebar-nav a:hover { background: #1f2730; }
+    .sidebar-nav a { display: flex; align-items: center; gap: .25rem; color: var(--ink); text-decoration: none; font-size: .68rem; font-weight: 300; padding: .25rem .55rem; border-radius: 8px; }
+    .sidebar-nav a:hover { background: var(--surface); }
     /* Groups: a 4-column grid of round letter-icon links. */
     .nav-group-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: .4rem; margin: .35rem 0 0; }
-    .nav-group-grid .group-badge { display: flex; align-items: center; justify-content: center; aspect-ratio: 1; border-radius: 50%; background: rgba(47,191,113,.16); color: #5fd99a; text-decoration: none; font-size: .8rem; font-weight: 600; }
-    .nav-group-grid .group-badge:hover { background: rgba(47,191,113,.30); }
+    .nav-group-grid .group-badge { display: flex; align-items: center; justify-content: center; aspect-ratio: 1; border-radius: 50%; background: rgba(var(--green-rgb),.16); color: var(--green-text); text-decoration: none; font-size: .8rem; font-weight: 600; }
+    .nav-group-grid .group-badge:hover { background: rgba(var(--green-rgb),.30); }
     /* Fixed-width flag box so group names (whose flag slot is empty)
        line up with team names. */
     .sidebar .flag { font-size: 1.15rem; line-height: 1; text-align: center; flex: 0 0 1.8rem; min-width: 0; }
@@ -135,7 +159,7 @@
       .sidebar-nav .nav-teams { columns: 2; }
       /* margin:0 removes Pico's button margin, whose margin-box would
          otherwise inflate the flex row and stretch the calendar button. */
-      .nav-toggle { flex: 1; margin: 0; display: inline-flex; align-items: center; justify-content: center; gap: .25rem; background: #1f2730; color: #e8e6e3; border: 0; border-radius: 8px; padding: 1rem .55rem; font-family: inherit; font-size: .68rem; line-height: 1.4; cursor: pointer; }
+      .nav-toggle { flex: 1; margin: 0; display: inline-flex; align-items: center; justify-content: center; gap: .25rem; background: var(--surface); color: var(--ink); border: 0; border-radius: 8px; padding: 1rem .55rem; font-family: inherit; font-size: .68rem; line-height: 1.4; cursor: pointer; }
       .nav-toggle .burger { width: .95rem; height: .95rem; }
       .sidebar .add-cal { padding: 1rem .55rem; }
       /* Animate open/close by transitioning the collapse to its
@@ -149,10 +173,11 @@
 {{end}}
 
 {{define "siteheader"}}
+  <a class="skip-link" href="#main">Skip to fixtures</a>
   <header class="site-header">
     <div class="site-header-inner">
       <h1><a href="/">⚽ World Cup 2026</a></h1>
-      <img class="mascot" src="/static/motson.png?v={{.AssetVersion}}" alt="John Motson">
+      <img class="mascot" src="/static/motson.png?v={{.AssetVersion}}" alt="John Motson" width="281" height="220">
     </div>
   </header>
 {{end}}
