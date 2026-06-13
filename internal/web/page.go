@@ -41,8 +41,6 @@ type pageData struct {
 	HasVenues     bool
 	AssetVersion  string
 	Nav           navData
-	FontFamily    string       // preview ?font= override: family name
-	FontHref      template.URL // preview ?font= override: stylesheet URL
 }
 
 type matchView struct {
@@ -89,9 +87,6 @@ func page(store fixtures.Store, host string) http.HandlerFunc {
 
 		data := pageData{FeedHost: host, AssetVersion: assetVersion, LastSyncedUTC: lastSynced(state), Nav: buildNav(matches, host)}
 		data.Matches, data.HasVenues = buildViews(matches)
-		if f, ok := fontBySlug(r.URL.Query().Get("font")); ok {
-			data.FontFamily, data.FontHref = f.Name, f.Href // preview override
-		}
 
 		render(w, "index.html.tmpl", data)
 	}

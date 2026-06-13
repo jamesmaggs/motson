@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, impeccable]
+    branches: [main]
   pull_request:
 
 jobs:
@@ -38,7 +38,7 @@ jobs:
 
   deploy:
     needs: test
-    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/impeccable') && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
