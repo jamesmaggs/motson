@@ -113,7 +113,10 @@
     .nav-toggle { display: none; }
     @media (max-width: 720px) {
       .layout { flex-direction: column; padding: 1rem; }
-      .sidebar { position: static; flex-basis: auto; width: 100%; }
+      /* Uniform spacing around the top buttons: panel inset, the gap
+         between them, and the space below all equal. */
+      .sidebar { position: static; flex-basis: auto; width: 100%; padding: .6rem; }
+      .sidebar-top { gap: .6rem; margin-bottom: .6rem; }
       .sidebar-nav .nav-teams { columns: 2; }
       /* margin:0 removes Pico's button margin, whose margin-box would
          otherwise inflate the flex row and stretch the calendar button. */
