@@ -83,6 +83,19 @@ func TestGroupDetailStandingsContent(t *testing.T) {
 	}
 }
 
+// Wayfinding: on a group page, that group's nav circle is marked active.
+func TestGroupPageHighlightsActiveGroupInNav(t *testing.T) {
+	body := get(t, groupA(t), now, "/groups/A").Body.String()
+
+	if !strings.Contains(body, `class="group-badge active" href="/groups/A" aria-current="page"`) {
+		t.Errorf("active group circle not highlighted in nav: %s", body)
+	}
+	// Only the current group is active.
+	if strings.Count(body, "group-badge active") != 1 {
+		t.Errorf("expected exactly one active group circle")
+	}
+}
+
 func TestUnknownGroupIsNotFound(t *testing.T) {
 	if rec := get(t, groupA(t), now, "/groups/Z"); rec.Code != http.StatusNotFound {
 		t.Errorf("status = %d, want 404 for unknown group", rec.Code)

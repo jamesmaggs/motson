@@ -69,6 +69,19 @@ func TestTeamPageLinksToGroupAndOtherTeams(t *testing.T) {
 	}
 }
 
+// Wayfinding: on a team page, both the team's nav link and its group's
+// circle are marked active.
+func TestTeamPageHighlightsTeamAndGroupInNav(t *testing.T) {
+	body := get(t, teamSpread(t), now, "/teams/canada").Body.String()
+
+	if !strings.Contains(body, `href="/teams/canada" class="active" aria-current="page"`) {
+		t.Errorf("active team not highlighted in nav: %s", body)
+	}
+	if !strings.Contains(body, `class="group-badge active" href="/groups/A"`) {
+		t.Errorf("team's group circle not highlighted in nav: %s", body)
+	}
+}
+
 func TestHyphenatedTeamSlug(t *testing.T) {
 	if rec := get(t, teamSpread(t), now, "/teams/south-korea"); rec.Code != http.StatusOK {
 		t.Errorf("/teams/south-korea status = %d, want 200", rec.Code)

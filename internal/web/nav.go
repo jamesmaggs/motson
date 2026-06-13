@@ -13,6 +13,10 @@ type navData struct {
 	FeedHost string // anchors the webcal calendar link (scheme is literal in the template)
 	Groups   []navLink
 	Teams    []teamEntry
+	// Wayfinding: the URL of the group / team the current page is for,
+	// so the sidebar highlights it. Empty on pages with no such context.
+	ActiveGroupURL string
+	ActiveTeamURL  string
 }
 
 type navLink struct {

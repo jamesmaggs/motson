@@ -177,6 +177,10 @@
     .nav-group-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: .4rem; margin: .35rem 0 0; }
     .nav-group-grid .group-badge { display: flex; align-items: center; justify-content: center; aspect-ratio: 1; border-radius: 50%; background: rgba(var(--green-rgb),.16); color: var(--green-text); text-decoration: none; font-size: .8rem; font-weight: 600; }
     .nav-group-grid .group-badge:hover { background: rgba(var(--green-rgb),.30); }
+    /* Wayfinding: the current group / team is marked in amber. */
+    .nav-group-grid .group-badge.active, .nav-group-grid .group-badge.active:hover { background: var(--accent); color: var(--bg); font-weight: 700; }
+    .nav-teams a.active { background: rgba(var(--accent-rgb),.12); color: var(--accent); font-weight: 600; }
+    .nav-teams a.active:hover { background: rgba(var(--accent-rgb),.2); }
     /* Fixed-width flag box so group names (whose flag slot is empty)
        line up with team names. */
     .sidebar .flag { font-size: 1.15rem; line-height: 1; text-align: center; flex: 0 0 1.8rem; min-width: 0; }
@@ -236,11 +240,11 @@
       <nav class="sidebar-nav" id="sidebar-nav">
         <p class="nav-heading">Groups</p>
         <div class="nav-group-grid">
-          {{range .Groups}}<a class="group-badge" href="{{.URL}}">{{.Letter}}</a>{{end}}
+          {{range .Groups}}<a class="group-badge{{if eq .URL $.ActiveGroupURL}} active{{end}}" href="{{.URL}}"{{if eq .URL $.ActiveGroupURL}} aria-current="page"{{end}}>{{.Letter}}</a>{{end}}
         </div>
         <p class="nav-heading">Teams</p>
         <ul class="nav-teams">
-          {{range .Teams}}<li><a href="{{.URL}}">{{if .Flag}}<span class="flag">{{.Flag}}</span>{{end}}{{.Name}}</a></li>{{end}}
+          {{range .Teams}}<li><a href="{{.URL}}"{{if eq .URL $.ActiveTeamURL}} class="active" aria-current="page"{{end}}>{{if .Flag}}<span class="flag">{{.Flag}}</span>{{end}}{{.Name}}</a></li>{{end}}
         </ul>
       </nav>
       </div>

@@ -70,6 +70,7 @@ func groupDetail(store fixtures.Store, host string) http.HandlerFunc {
 			LastSyncedUTC: lastSynced(state),
 			Nav:           buildNav(matches, host),
 		}
+		data.Nav.ActiveGroupURL = "/groups/" + r.PathValue("group") // highlight this group in the nav
 		data.Matches, data.HasVenues = buildViews(group)
 		// On a group's own page the group is implied, so drop the
 		// self-referential group pill from each card (as knockout cards

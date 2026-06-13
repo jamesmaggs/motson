@@ -120,6 +120,9 @@ func teamDetail(store fixtures.Store, host string) http.HandlerFunc {
 			}
 		}
 		data.Matches, data.HasVenues = buildViews(own)
+		// Highlight this team — and its group — in the nav.
+		data.Nav.ActiveTeamURL = teamURL(team.Name)
+		data.Nav.ActiveGroupURL = data.GroupURL
 
 		render(w, "teamdetail.html.tmpl", data)
 	}

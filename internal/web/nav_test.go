@@ -25,7 +25,9 @@ func TestSidebarListsGroupsAndTeams(t *testing.T) {
 			t.Errorf("%s: sidebar missing", path)
 			continue
 		}
-		if !strings.Contains(body, `<div class="nav-group-grid">`) || !strings.Contains(body, `<a class="group-badge" href="/groups/A">A</a>`) {
+		// Check group B's badge: it's never the active page here, so its
+		// plain (non-highlighted) markup is stable across all three paths.
+		if !strings.Contains(body, `<div class="nav-group-grid">`) || !strings.Contains(body, `<a class="group-badge" href="/groups/B">B</a>`) {
 			t.Errorf("%s: group letter badges missing from sidebar", path)
 		}
 		if !strings.Contains(body, `<ul class="nav-teams">`) ||
