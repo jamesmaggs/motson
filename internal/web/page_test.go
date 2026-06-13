@@ -121,8 +121,8 @@ func TestVenueShownWhenPresent(t *testing.T) {
 func TestPageHasFootballTitleAndFavicon(t *testing.T) {
 	body := get(t, seeded(t, match("wc-1")), now, "/").Body.String()
 
-	if !strings.Contains(body, "<h1>⚽ World Cup 2026</h1>") {
-		t.Errorf("title missing leading football emoji: %s", body)
+	if !strings.Contains(body, `<h1><a href="/">⚽ World Cup 2026</a></h1>`) {
+		t.Errorf("title should link home with the football emoji: %s", body)
 	}
 	if !strings.Contains(body, `rel="icon"`) || !strings.Contains(body, "image/svg+xml") {
 		t.Errorf("favicon link missing: %s", body)
