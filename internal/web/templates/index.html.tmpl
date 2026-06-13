@@ -18,13 +18,11 @@
         </div>
         <div class="scoreline">
           <div class="side">
-            <span class="flag">{{.HomeFlag}}</span>
-            <span class="name">{{if .HomeURL}}<a href="{{.HomeURL}}">{{.HomeTeam}}</a>{{else}}{{.HomeTeam}}{{end}}</span>
+            {{if .HomeURL}}<a class="team" href="{{.HomeURL}}"><span class="flag">{{.HomeFlag}}</span><span class="name">{{.HomeTeam}}</span></a>{{else}}<span class="flag">{{.HomeFlag}}</span><span class="name">{{.HomeTeam}}</span>{{end}}
           </div>
           {{if .HomeGoals}}<div class="score">{{.HomeGoals}}<span class="sep">:</span>{{.AwayGoals}}{{if .Pens}}<span class="pens">{{.Pens}}</span>{{end}}</div>{{else}}<div class="vs">vs</div>{{end}}
           <div class="side">
-            <span class="flag">{{.AwayFlag}}</span>
-            <span class="name">{{if .AwayURL}}<a href="{{.AwayURL}}">{{.AwayTeam}}</a>{{else}}{{.AwayTeam}}{{end}}</span>
+            {{if .AwayURL}}<a class="team" href="{{.AwayURL}}"><span class="flag">{{.AwayFlag}}</span><span class="name">{{.AwayTeam}}</span></a>{{else}}<span class="flag">{{.AwayFlag}}</span><span class="name">{{.AwayTeam}}</span>{{end}}
           </div>
         </div>
         {{if .Venue}}<div class="venue">{{.Venue}}</div>{{end}}

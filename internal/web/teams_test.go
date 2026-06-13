@@ -84,8 +84,8 @@ func TestTeamNamesLinkEverywhere(t *testing.T) {
 	st := teamSpread(t)
 
 	index := get(t, st, now, "/").Body.String()
-	if !strings.Contains(index, `<a href="/teams/canada">Canada</a>`) {
-		t.Errorf("index match cells missing team link: %s", index)
+	if !strings.Contains(index, `<a class="team" href="/teams/canada">`) {
+		t.Errorf("index card missing team link: %s", index)
 	}
 	if strings.Contains(index, `href="/teams/"`) {
 		t.Errorf("TBC side must not link")

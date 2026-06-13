@@ -161,17 +161,17 @@ func TestUnnamedTeamsRenderAsTBC(t *testing.T) {
 	}
 }
 
-// Guarantee: TeamFlags — each side shows its flag with its (linked)
-// name within the card.
-func TestCardShowsFlagAndLinkedName(t *testing.T) {
+// Guarantee: TeamFlags/TeamNamesLink — each side's flag and name are
+// wrapped in a single link to the team page.
+func TestCardFlagAndNameLinkToTeam(t *testing.T) {
 	body := get(t, seeded(t, match("wc-1")), now, "/").Body.String()
 
 	for _, want := range []string{
-		`<span class="flag">🇨🇦</span>`, `<span class="name"><a href="/teams/canada">Canada</a></span>`,
-		`<span class="flag">🇲🇽</span>`, `<span class="name"><a href="/teams/mexico">Mexico</a></span>`,
+		`<a class="team" href="/teams/canada"><span class="flag">🇨🇦</span><span class="name">Canada</span></a>`,
+		`<a class="team" href="/teams/mexico"><span class="flag">🇲🇽</span><span class="name">Mexico</span></a>`,
 	} {
 		if !strings.Contains(body, want) {
-			t.Errorf("card missing %q: %s", want, body)
+			t.Errorf("card missing team link with flag+name %q: %s", want, body)
 		}
 	}
 }

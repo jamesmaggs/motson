@@ -61,8 +61,9 @@
     .side { text-align: center; }
     .side .flag { font-size: 2.8rem; line-height: 1; }
     .name { display: block; margin-top: .5rem; font-size: .9rem; font-weight: 300; }
-    .name a { color: inherit; text-decoration: none; }
-    .name a:hover { text-decoration: underline; }
+    /* Flag + name share one link to the team page. */
+    .side .team { display: block; color: inherit; text-decoration: none; }
+    .side .team:hover .name { text-decoration: underline; }
     .score { font-size: 2rem; font-weight: 700; color: #ffd23f; font-variant-numeric: tabular-nums; white-space: nowrap; padding-top: .5rem; }
     .score .sep { margin: 0 .3rem; color: #79838e; font-weight: 400; }
     .vs { font-size: 1.1rem; color: #79838e; padding-top: .9rem; }
@@ -172,13 +173,13 @@
 {{end}}
 
 {{define "matchCells"}}
-          <td class="home">{{if .HomeURL}}<a href="{{.HomeURL}}">{{.HomeTeam}}</a>{{else}}{{.HomeTeam}}{{end}}{{if .HomeFlag}} {{.HomeFlag}}{{end}}</td>
+          <td class="home">{{if .HomeURL}}<a href="{{.HomeURL}}">{{.HomeTeam}}{{if .HomeFlag}} {{.HomeFlag}}{{end}}</a>{{else}}{{.HomeTeam}}{{if .HomeFlag}} {{.HomeFlag}}{{end}}{{end}}</td>
           <td class="score">
             {{if .Score}}{{.Score}}{{else}}<span class="state">vs</span>{{end}}
             {{if .Pens}}<br><small class="state">{{.Pens}}</small>{{end}}
             {{if .StatusLabel}}<br><small class="state">{{.StatusLabel}}</small>{{end}}
           </td>
-          <td class="away">{{if .AwayFlag}}{{.AwayFlag}} {{end}}{{if .AwayURL}}<a href="{{.AwayURL}}">{{.AwayTeam}}</a>{{else}}{{.AwayTeam}}{{end}}</td>
+          <td class="away">{{if .AwayURL}}<a href="{{.AwayURL}}">{{if .AwayFlag}}{{.AwayFlag}} {{end}}{{.AwayTeam}}</a>{{else}}{{if .AwayFlag}}{{.AwayFlag}} {{end}}{{.AwayTeam}}{{end}}</td>
 {{end}}
 
 {{define "standingsTable"}}
