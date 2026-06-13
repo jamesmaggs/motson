@@ -123,6 +123,11 @@
     /* Standings in a card container matching the match cards. */
     .standings-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1rem 1.1rem; }
     .standings-title { margin: 0 0 .6rem; font-size: 1.5rem; }
+    /* Team page: group name as a subtitle under the team-name title. */
+    .standings-card:has(.standings-sub) .standings-title { margin-bottom: .1rem; }
+    .standings-sub { margin: 0 0 .7rem; font-size: .85rem; color: var(--muted); }
+    .standings-sub a { color: var(--muted); text-decoration: none; }
+    .standings-sub a:hover { color: var(--accent); text-decoration: underline; }
     .standings-card table { margin: 0; font-size: .82em; }
     .standings-card th, .standings-card td { text-align: center; padding: .55rem .35rem; }
     /* Extra breathing room between the team names and the figures. */
@@ -132,6 +137,9 @@
     /* Faint divider between rows. */
     .standings-card tbody td { border-bottom: 1px solid var(--border); }
     .standings-card tbody tr:last-child td { border-bottom: 0; }
+    /* The current team's row (TeamDetailPage) — a subtle amber band. */
+    .standings-card tbody tr.current td { background: rgba(var(--accent-rgb), .1); }
+    .standings-card tbody tr.current td:first-child { font-weight: 600; }
 
     /* Full-width site header above a two-column layout. The mascot is
        sized in rem so it scales with the header's type, and sits flush
@@ -279,7 +287,7 @@
       </thead>
       <tbody>
         {{range .}}
-        <tr>
+        <tr{{if .Current}} class="current"{{end}}>
           <td>{{if .URL}}<a href="{{.URL}}">{{if .Flag}}<span class="flag">{{.Flag}}</span> {{end}}{{.Team}}</a>{{else}}{{if .Flag}}<span class="flag">{{.Flag}}</span> {{end}}{{.Team}}{{end}}</td>
           <td>{{.Played}}</td>
           <td>{{.Won}}</td>

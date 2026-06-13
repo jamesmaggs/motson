@@ -53,7 +53,6 @@ type teamDetailData struct {
 	GroupURL      string
 	Standings     []standingRow
 	Matches       []matchView
-	OtherTeams    []teamEntry
 	LastSyncedUTC string
 	AssetVersion  string
 	HasVenues     bool
@@ -113,16 +112,14 @@ func teamDetail(store fixtures.Store, host string) http.HandlerFunc {
 				}
 			}
 			data.Standings = standingRows(groupMatches)
+			for i := range data.Standings {
+				data.Standings[i].Current = data.Standings[i].Team == team.Name
+			}
 			if letter, ok := strings.CutPrefix(data.GroupName, "Group "); ok {
 				data.GroupURL = "/groups/" + letter
 			}
 		}
 		data.Matches, data.HasVenues = buildViews(own)
-		for _, t := range all {
-			if t.Name != team.Name {
-				data.OtherTeams = append(data.OtherTeams, t)
-			}
-		}
 
 		render(w, "teamdetail.html.tmpl", data)
 	}

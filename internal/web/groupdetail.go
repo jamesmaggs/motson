@@ -8,8 +8,9 @@ import (
 
 type standingRow struct {
 	fixtures.GroupStanding
-	URL  string
-	Flag string
+	URL     string
+	Flag    string
+	Current bool // the team whose page this is — highlighted on TeamDetailPage
 }
 
 // standingRows computes a group's standings with team-page links

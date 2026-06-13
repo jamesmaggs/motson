@@ -372,6 +372,17 @@ surface TeamDetailPage {
     @guarantee PublicAccess
         -- The page requires no authentication.
 
+    @guidance
+        -- Presented with the same chrome as FixturesPage and
+        -- GroupDetailPage: the navigation menu, the team's matches as
+        -- cards (across all stages, group-stage cards linking to the
+        -- GroupDetailPage), and the team's group standings in a card.
+        -- The standings card is titled with the team's name and flag,
+        -- the group name beneath it, and the team's own row is
+        -- highlighted. On wide screens these form three columns (menu,
+        -- matches, table); when stacked, the table leads. Navigation to
+        -- other teams is the always-present menu.
+
     related:
         GroupDetailPage(schedule)
         FixturesPage(schedule)

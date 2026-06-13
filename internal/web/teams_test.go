@@ -47,10 +47,10 @@ func TestTeamDetailPage(t *testing.T) {
 	if !strings.Contains(body, "Semi-final") {
 		t.Errorf("knockout fixture missing from team page")
 	}
-	// Exactly Canada's two fixtures — no other team's matches leak in
-	// (team names legitimately appear in the other-teams navigation).
-	if got := strings.Count(body, `<td class="score">`); got != 2 {
-		t.Errorf("got %d fixture rows, want 2 (Canada's only)", got)
+	// Exactly Canada's two fixtures as cards — no other team's matches
+	// leak in (team names legitimately appear in the sidebar nav).
+	if got := strings.Count(body, `<article class="card`); got != 2 {
+		t.Errorf("got %d fixture cards, want 2 (Canada's only)", got)
 	}
 }
 
