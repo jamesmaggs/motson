@@ -25,11 +25,12 @@
       --green-text: #5fd99a;    /* group pill / badge text */
       --green-bright: #6ee0a6;  /* LIVE badge */
       --green-rgb: 47, 191, 113;
+      --body-font: Inter, -apple-system, system-ui, sans-serif; /* data/body face */
     }
     /* Floodlit scoreboard: dark night-match chrome, amber scores,
        Bebas Neue title over Inter data. */
     html { background: var(--bg); }
-    body { background: var(--bg); color: var(--ink); font-family: Inter, -apple-system, system-ui, sans-serif; min-height: 100vh; }
+    body { background: var(--bg); color: var(--ink); font-family: var(--body-font); min-height: 100vh; }
     /* Visible keyboard focus on every interactive element (links here
        drop their underline, so the browser default isn't enough). */
     a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }

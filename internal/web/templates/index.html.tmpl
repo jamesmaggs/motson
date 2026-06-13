@@ -2,6 +2,7 @@
 <html lang="en">
 {{template "head" .}}
 <body>
+  {{if .FontHref}}<link rel="stylesheet" href="{{.FontHref}}"><style>:root { --body-font: "{{.FontFamily}}", -apple-system, system-ui, sans-serif; }</style>{{end}}
   {{template "siteheader" .}}
   <div class="layout">
     {{template "sidebar" .Nav}}

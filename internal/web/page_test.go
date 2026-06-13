@@ -228,6 +228,61 @@ func TestPageSubscribeLinkUsesWebcalScheme(t *testing.T) {
 	}
 }
 
+// Preview tooling: ?font=<slug> on the index swaps the body/data
+// typeface for one of the alternatives, loading its stylesheet and
+// overriding the --body-font custom property. (impeccable branch only.)
+func TestIndexFontOverrideAppliesChosenTypeface(t *testing.T) {
+	body := get(t, seeded(t, match("wc-1")), now, "/?font=sora").Body.String()
+
+	if !strings.Contains(body, "family=Sora") {
+		t.Errorf("font override should load the Sora stylesheet: %s", body)
+	}
+	if !strings.Contains(body, `--body-font: "Sora"`) {
+		t.Errorf("font override should set --body-font to Sora: %s", body)
+	}
+}
+
+// An unknown or absent ?font leaves the default Inter face in place and
+// injects no external stylesheet.
+func TestIndexFontOverrideIgnoresUnknownSlug(t *testing.T) {
+	body := get(t, seeded(t, match("wc-1")), now, "/?font=not-a-font").Body.String()
+
+	if strings.Contains(body, "fonts.googleapis.com") {
+		t.Errorf("unknown font slug must not inject a stylesheet: %s", body)
+	}
+	// The default --body-font: Inter is always present; an override is
+	// distinguished by a quoted family name. There must be none.
+	if strings.Contains(body, `--body-font: "`) {
+		t.Errorf("unknown font slug must not override --body-font: %s", body)
+	}
+}
+
+// The /fonts gallery lists every preview typeface as a labelled iframe
+// pointing at the index with that font applied, so the faces can be
+// compared side by side.
+func TestFontGalleryListsEveryTypefaceAsAFrame(t *testing.T) {
+	rec := get(t, seeded(t, match("wc-1")), now, "/fonts")
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want 200", rec.Code)
+	}
+	body := rec.Body.String()
+	for _, want := range []struct{ slug, name string }{
+		{"hanken-grotesk", "Hanken Grotesk"}, {"sora", "Sora"}, {"manrope", "Manrope"},
+		{"outfit", "Outfit"}, {"ibm-plex-sans", "IBM Plex Sans"}, {"public-sans", "Public Sans"},
+		{"archivo", "Archivo"}, {"chivo", "Chivo"}, {"saira", "Saira"}, {"figtree", "Figtree"},
+	} {
+		if !strings.Contains(body, `src="/?font=`+want.slug+`"`) {
+			t.Errorf("gallery missing iframe for %q", want.slug)
+		}
+		if !strings.Contains(body, want.name) {
+			t.Errorf("gallery missing label for %q", want.name)
+		}
+	}
+	if got := strings.Count(body, "<iframe"); got != 10 {
+		t.Errorf("got %d iframes, want one per font (10)", got)
+	}
+}
+
 func TestPageMarksCancelledAndPostponedMatches(t *testing.T) {
 	cancelled := match("wc-1")
 	cancelled.Status = fixtures.StatusCancelled
