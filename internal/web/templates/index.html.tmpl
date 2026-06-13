@@ -12,7 +12,7 @@
         <div class="card-top">
           <div class="meta">
             <span class="stage">{{.StageName}}</span>
-            <time class="kickoff" datetime="{{.KickoffUTC}}">{{.KickoffUTC}}</time>
+            {{if .Live}}<span class="live-badge"><span class="live-dot"></span>LIVE</span>{{else}}<time class="kickoff" datetime="{{.KickoffUTC}}">{{.KickoffUTC}}</time>{{end}}
           </div>
           {{if .GroupName}}<a class="group" href="{{.GroupURL}}">{{.GroupName}}</a>{{end}}
         </div>
