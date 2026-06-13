@@ -241,6 +241,53 @@ func TestPageUsesSoraAsBodyFont(t *testing.T) {
 	}
 }
 
+// Kick-off times degrade gracefully without JS: the datetime stays
+// machine-readable ISO UTC, but the visible text is a friendly UTC
+// label (client JS replaces it with local time).
+func TestKickoffShowsUTCFallbackWithISODatetime(t *testing.T) {
+	body := get(t, seeded(t, match("wc-1")), now, "/").Body.String()
+
+	if !strings.Contains(body, `datetime="2026-06-13T18:00:00Z"`) {
+		t.Errorf("kickoff datetime should stay ISO UTC: %s", body)
+	}
+	if !strings.Contains(body, "UTC</time>") {
+		t.Errorf("kickoff should show a human UTC fallback, not raw ISO: %s", body)
+	}
+}
+
+// With no fixtures the index shows a welcoming empty state, not a blank
+// page.
+func TestIndexShowsEmptyStateWhenNoFixtures(t *testing.T) {
+	body := get(t, seeded(t), now, "/").Body.String()
+	if !strings.Contains(body, `class="empty"`) {
+		t.Errorf("empty index should show an empty state: %s", body)
+	}
+}
+
+// Unknown URLs get a branded, navigable 404 rather than plain text.
+func TestUnknownPathReturnsStyledNotFound(t *testing.T) {
+	rec := get(t, seeded(t, match("wc-1")), now, "/no-such-page")
+	if rec.Code != http.StatusNotFound {
+		t.Fatalf("status = %d, want 404", rec.Code)
+	}
+	body := rec.Body.String()
+	if !strings.Contains(body, "World Cup 2026") || !strings.Contains(body, `href="/"`) {
+		t.Errorf("404 should be branded with a way home: %s", body)
+	}
+}
+
+// Fingerprinted static assets are cacheable forever (the ?v= query busts
+// the URL on each build).
+func TestStaticAssetsAreLongLivedCacheable(t *testing.T) {
+	rec := get(t, seeded(t, match("wc-1")), now, "/static/fonts.css")
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want 200", rec.Code)
+	}
+	if cc := rec.Header().Get("Cache-Control"); !strings.Contains(cc, "max-age=31536000") || !strings.Contains(cc, "immutable") {
+		t.Errorf("static Cache-Control = %q, want long-lived immutable", cc)
+	}
+}
+
 func TestPageMarksCancelledAndPostponedMatches(t *testing.T) {
 	cancelled := match("wc-1")
 	cancelled.Status = fixtures.StatusCancelled

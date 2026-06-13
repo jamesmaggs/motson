@@ -47,16 +47,17 @@ func collectTeams(matches []fixtures.Match) []teamEntry {
 }
 
 type teamDetailData struct {
-	TeamName      string
-	Flag          string
-	GroupName     string
-	GroupURL      string
-	Standings     []standingRow
-	Matches       []matchView
-	LastSyncedUTC string
-	AssetVersion  string
-	HasVenues     bool
-	Nav           navData
+	TeamName        string
+	Flag            string
+	GroupName       string
+	GroupURL        string
+	Standings       []standingRow
+	Matches         []matchView
+	LastSyncedUTC   string
+	LastSyncedLabel string
+	AssetVersion    string
+	HasVenues       bool
+	Nav             navData
 }
 
 // teamDetail renders the TeamDetailPage surface: the team's group
@@ -67,12 +68,12 @@ func teamDetail(store fixtures.Store, host string) http.HandlerFunc {
 
 		matches, err := store.Matches(r.Context())
 		if err != nil {
-			http.Error(w, "fixtures unavailable", http.StatusInternalServerError)
+			errFixturesUnavailable(w)
 			return
 		}
 		state, err := store.SyncState(r.Context())
 		if err != nil {
-			http.Error(w, "fixtures unavailable", http.StatusInternalServerError)
+			errFixturesUnavailable(w)
 			return
 		}
 
@@ -85,16 +86,18 @@ func teamDetail(store fixtures.Store, host string) http.HandlerFunc {
 			}
 		}
 		if team.Name == "" {
-			http.NotFound(w, r)
+			renderError(w, http.StatusNotFound, "Team not found",
+				"We couldn't find that team. Browse all teams from the menu.")
 			return
 		}
 
 		data := teamDetailData{
-			TeamName:      team.Name,
-			Flag:          team.Flag,
-			LastSyncedUTC: lastSynced(state),
-			AssetVersion:  assetVersion,
-			Nav:           buildNav(matches, host),
+			TeamName:        team.Name,
+			Flag:            team.Flag,
+			LastSyncedUTC:   lastSynced(state),
+			LastSyncedLabel: syncedLabel(state),
+			AssetVersion:    assetVersion,
+			Nav:             buildNav(matches, host),
 		}
 		var own, groupMatches []fixtures.Match
 		for _, m := range matches {

@@ -21,8 +21,25 @@ func NewHandler(store fixtures.Store, host string, clock func() time.Time) http.
 	mux.HandleFunc("GET /teams/{team}", teamDetail(store, host))
 	mux.HandleFunc("GET /healthz", healthz(store, clock))
 	mux.HandleFunc("GET /calendar.ics", calendar(store, host))
-	mux.Handle("GET /static/", http.FileServerFS(staticFS))
+	mux.Handle("GET /static/", cacheForever(http.FileServerFS(staticFS)))
+	// Catch-all: any unmatched path gets the styled 404 (more specific
+	// patterns above win for real routes).
+	mux.HandleFunc("GET /", notFound)
 	return mux
+}
+
+// cacheForever lets clients cache static assets indefinitely; they are
+// fingerprinted with ?v=<build>, so a new build busts the URL.
+func cacheForever(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
+		h.ServeHTTP(w, r)
+	})
+}
+
+func notFound(w http.ResponseWriter, r *http.Request) {
+	renderError(w, http.StatusNotFound, "Page not found",
+		"That page doesn't exist. Head back to the fixtures.")
 }
 
 func healthz(store fixtures.Store, clock func() time.Time) http.HandlerFunc {

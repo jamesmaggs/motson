@@ -6,9 +6,13 @@
   <div class="layout">
     {{template "sidebar" .Nav}}
     <main class="content" id="main" tabindex="-1">
+    {{if .Matches}}
     <div class="cards">
       {{range .Matches}}{{template "matchCard" .}}{{end}}
     </div>
+    {{else}}
+    <p class="empty">No fixtures yet — they'll appear here as soon as the match schedule is published.</p>
+    {{end}}
 {{template "footer" .}}
 </body>
 </html>

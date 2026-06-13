@@ -25,13 +25,14 @@ func standingRows(groupMatches []fixtures.Match) []standingRow {
 }
 
 type groupDetailData struct {
-	GroupName     string
-	Standings     []standingRow
-	Matches       []matchView
-	LastSyncedUTC string
-	AssetVersion  string
-	HasVenues     bool
-	Nav           navData
+	GroupName       string
+	Standings       []standingRow
+	Matches         []matchView
+	LastSyncedUTC   string
+	LastSyncedLabel string
+	AssetVersion    string
+	HasVenues       bool
+	Nav             navData
 }
 
 // groupDetail renders the GroupDetailPage surface: one group's
@@ -43,12 +44,12 @@ func groupDetail(store fixtures.Store, host string) http.HandlerFunc {
 
 		matches, err := store.Matches(r.Context())
 		if err != nil {
-			http.Error(w, "fixtures unavailable", http.StatusInternalServerError)
+			errFixturesUnavailable(w)
 			return
 		}
 		state, err := store.SyncState(r.Context())
 		if err != nil {
-			http.Error(w, "fixtures unavailable", http.StatusInternalServerError)
+			errFixturesUnavailable(w)
 			return
 		}
 
@@ -59,16 +60,18 @@ func groupDetail(store fixtures.Store, host string) http.HandlerFunc {
 			}
 		}
 		if len(group) == 0 {
-			http.NotFound(w, r)
+			renderError(w, http.StatusNotFound, "Group not found",
+				"We couldn't find that group — the World Cup runs in groups A to L. Pick one from the menu.")
 			return
 		}
 
 		data := groupDetailData{
-			GroupName:     groupName,
-			Standings:     standingRows(group),
-			AssetVersion:  assetVersion,
-			LastSyncedUTC: lastSynced(state),
-			Nav:           buildNav(matches, host),
+			GroupName:       groupName,
+			Standings:       standingRows(group),
+			AssetVersion:    assetVersion,
+			LastSyncedUTC:   lastSynced(state),
+			LastSyncedLabel: syncedLabel(state),
+			Nav:             buildNav(matches, host),
 		}
 		data.Nav.ActiveGroupURL = "/groups/" + r.PathValue("group") // highlight this group in the nav
 		data.Matches, data.HasVenues = buildViews(group)

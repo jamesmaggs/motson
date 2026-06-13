@@ -35,35 +35,74 @@ var staticFS embed.FS
 var templates = template.Must(template.ParseFS(templateFS, "templates/*.tmpl"))
 
 type pageData struct {
-	Matches       []matchView
-	LastSyncedUTC string
-	FeedHost      string
-	HasVenues     bool
-	AssetVersion  string
-	Nav           navData
+	Matches         []matchView
+	LastSyncedUTC   string
+	LastSyncedLabel string
+	FeedHost        string
+	HasVenues       bool
+	AssetVersion    string
+	Nav             navData
+}
+
+// errorData backs the styled error page (404s and 500s).
+type errorData struct {
+	AssetVersion string
+	Status       int
+	Title        string
+	Message      string
+}
+
+// utcLabel is a human-readable UTC time shown as the no-JS fallback for a
+// <time> element; client JS replaces it with the visitor's local time.
+func utcLabel(t time.Time) string {
+	return t.UTC().Format("Mon 2 Jan, 15:04") + " UTC"
+}
+
+func syncedLabel(state fixtures.SyncState) string {
+	if state.LastSyncedAt == nil {
+		return ""
+	}
+	return utcLabel(*state.LastSyncedAt)
+}
+
+// renderError writes a styled error page with the given HTTP status.
+func renderError(w http.ResponseWriter, status int, title, message string) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.WriteHeader(status)
+	data := errorData{AssetVersion: assetVersion, Status: status, Title: title, Message: message}
+	if err := templates.ExecuteTemplate(w, "error.html.tmpl", data); err != nil {
+		slog.Error("rendering error page", "error", err)
+	}
+}
+
+// errFixturesUnavailable renders the 500 shown when the store can't be read.
+func errFixturesUnavailable(w http.ResponseWriter) {
+	renderError(w, http.StatusInternalServerError, "Something went wrong",
+		"We couldn't load the fixtures just now. Please try again in a moment.")
 }
 
 type matchView struct {
-	HomeTeam    string
-	AwayTeam    string
-	HomeURL     string // team page link; empty for unnamed sides
-	AwayURL     string
-	HomeFlag    string
-	AwayFlag    string
-	KickoffUTC  string
-	Venue       string
-	StageLabel  string // table stage column: group name, or stage for knockouts
-	StageURL    string // link to the group detail page; empty for knockouts
-	StageName   string // card top-left: always the stage label ("Group stage")
-	GroupName   string // card group pill: "Group A", empty for knockouts
-	GroupURL    string // card group pill link
-	Score       string // combined "2 – 1" for table views; empty until finished
-	HomeGoals   string // card score: home goals, empty until finished
-	AwayGoals   string // card score: away goals
-	Pens        string // "4–2 pens" for a finished shootout, else empty
-	StatusLabel string // "In play", "Postponed", "Cancelled" or empty
-	Live        bool   // match in progress — shown with a LIVE badge
-	AriaLabel   string // accessible name summarising the card for screen readers
+	HomeTeam     string
+	AwayTeam     string
+	HomeURL      string // team page link; empty for unnamed sides
+	AwayURL      string
+	HomeFlag     string
+	AwayFlag     string
+	KickoffUTC   string // machine-readable ISO 8601 UTC (the <time> datetime)
+	KickoffLabel string // human-readable UTC fallback shown until JS localises it
+	Venue        string
+	StageLabel   string // table stage column: group name, or stage for knockouts
+	StageURL     string // link to the group detail page; empty for knockouts
+	StageName    string // card top-left: always the stage label ("Group stage")
+	GroupName    string // card group pill: "Group A", empty for knockouts
+	GroupURL     string // card group pill link
+	Score        string // combined "2 – 1" for table views; empty until finished
+	HomeGoals    string // card score: home goals, empty until finished
+	AwayGoals    string // card score: away goals
+	Pens         string // "4–2 pens" for a finished shootout, else empty
+	StatusLabel  string // "In play", "Postponed", "Cancelled" or empty
+	Live         bool   // match in progress — shown with a LIVE badge
+	AriaLabel    string // accessible name summarising the card for screen readers
 }
 
 var stateLabels = map[fixtures.Status]string{
@@ -76,16 +115,16 @@ func page(store fixtures.Store, host string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		matches, err := store.Matches(r.Context())
 		if err != nil {
-			http.Error(w, "fixtures unavailable", http.StatusInternalServerError)
+			errFixturesUnavailable(w)
 			return
 		}
 		state, err := store.SyncState(r.Context())
 		if err != nil {
-			http.Error(w, "fixtures unavailable", http.StatusInternalServerError)
+			errFixturesUnavailable(w)
 			return
 		}
 
-		data := pageData{FeedHost: host, AssetVersion: assetVersion, LastSyncedUTC: lastSynced(state), Nav: buildNav(matches, host)}
+		data := pageData{FeedHost: host, AssetVersion: assetVersion, LastSyncedUTC: lastSynced(state), LastSyncedLabel: syncedLabel(state), Nav: buildNav(matches, host)}
 		data.Matches, data.HasVenues = buildViews(matches)
 
 		render(w, "index.html.tmpl", data)
@@ -127,18 +166,19 @@ func nameOrTBC(team string) string {
 
 func viewOf(m fixtures.Match) matchView {
 	v := matchView{
-		HomeTeam:    nameOrTBC(m.HomeTeam),
-		AwayTeam:    nameOrTBC(m.AwayTeam),
-		HomeURL:     teamURL(m.HomeTeam),
-		AwayURL:     teamURL(m.AwayTeam),
-		HomeFlag:    flagFor(m.HomeTeam),
-		AwayFlag:    flagFor(m.AwayTeam),
-		KickoffUTC:  m.KickoffAt.UTC().Format(time.RFC3339),
-		Venue:       m.Venue,
-		StageLabel:  m.GroupName,
-		StageName:   m.Stage.Label(),
-		StatusLabel: stateLabels[m.Status],
-		Live:        m.Status == fixtures.StatusInPlay,
+		HomeTeam:     nameOrTBC(m.HomeTeam),
+		AwayTeam:     nameOrTBC(m.AwayTeam),
+		HomeURL:      teamURL(m.HomeTeam),
+		AwayURL:      teamURL(m.AwayTeam),
+		HomeFlag:     flagFor(m.HomeTeam),
+		AwayFlag:     flagFor(m.AwayTeam),
+		KickoffUTC:   m.KickoffAt.UTC().Format(time.RFC3339),
+		KickoffLabel: utcLabel(m.KickoffAt),
+		Venue:        m.Venue,
+		StageLabel:   m.GroupName,
+		StageName:    m.Stage.Label(),
+		StatusLabel:  stateLabels[m.Status],
+		Live:         m.Status == fixtures.StatusInPlay,
 	}
 	if m.Stage != fixtures.StageGroup {
 		v.StageLabel = m.Stage.Label()

@@ -1,7 +1,9 @@
 {{define "head"}}
 <head>
   <meta charset="utf-8">
+  <script>document.documentElement.classList.add('js')</script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Live fixtures, results and group standings for the 2026 FIFA World Cup. Kick-off times shown in your local timezone.">
   <title>Motson — World Cup 2026 fixtures</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>">
   <link rel="stylesheet" href="/static/pico.min.css?v={{.AssetVersion}}">
@@ -109,6 +111,14 @@
     .pens { display: block; font-size: .68rem; font-weight: 400; color: var(--muted); margin-top: .2rem; }
     .venue { text-align: center; color: var(--muted); font-size: .72rem; margin-top: .9rem; }
     .status { text-align: center; color: var(--muted); font-size: .72rem; margin-top: .9rem; }
+    .empty { color: var(--muted); padding: 2rem 0; }
+
+    /* Error page (404 / 500): centred, self-contained, no sidebar. */
+    .error-page { max-width: 1180px; margin: 0 auto; padding: 4rem 1.5rem; text-align: center; }
+    .error-status { font-family: "Bebas Neue", Sora, sans-serif; font-size: 5rem; letter-spacing: .06em; color: var(--accent); margin: 0; line-height: 1; }
+    .error-title { margin: .5rem 0 0; }
+    .error-message { color: var(--muted); max-width: 42ch; margin: .75rem auto 1.5rem; }
+    .error-home { font-weight: 600; }
 
     /* Group page: three columns — menu (sidebar) | matches | standings.
        DOM order is standings-then-matches (the source order the spec
@@ -200,14 +210,16 @@
       .sidebar-nav .nav-teams { columns: 2; }
       /* margin:0 removes Pico's button margin, whose margin-box would
          otherwise inflate the flex row and stretch the calendar button. */
-      .nav-toggle { flex: 1; margin: 0; display: inline-flex; align-items: center; justify-content: center; gap: .25rem; background: var(--surface); color: var(--ink); border: 0; border-radius: 8px; padding: 1rem .55rem; font-family: inherit; font-size: .68rem; line-height: 1.4; cursor: pointer; }
+      /* Collapsible nav is a JS progressive enhancement: without JS the
+         toggle is hidden and the menu stays open (below). */
+      html.js .nav-toggle { flex: 1; margin: 0; display: inline-flex; align-items: center; justify-content: center; gap: .25rem; background: var(--surface); color: var(--ink); border: 0; border-radius: 8px; padding: 1rem .55rem; font-family: inherit; font-size: .68rem; line-height: 1.4; cursor: pointer; }
       .nav-toggle .burger { width: .95rem; height: .95rem; }
       .sidebar .add-cal { padding: 1rem .55rem; }
       /* Animate open/close by transitioning the collapse to its
          content height (grid-template-rows 0fr -> 1fr). */
-      .nav-collapse { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .3s ease; }
-      .nav-collapse > .sidebar-nav { overflow: hidden; min-height: 0; }
-      .sidebar.nav-open .nav-collapse { grid-template-rows: 1fr; margin-top: .6rem; }
+      html.js .nav-collapse { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .3s ease; }
+      html.js .nav-collapse > .sidebar-nav { overflow: hidden; min-height: 0; }
+      html.js .sidebar.nav-open .nav-collapse { grid-template-rows: 1fr; margin-top: .6rem; }
       /* Group page stacks to one column; DOM order (standings then
          matches) puts the table first, as requested. */
       .group-cols { grid-template-columns: 1fr; gap: 1.5rem; }
@@ -218,7 +230,7 @@
 {{end}}
 
 {{define "siteheader"}}
-  <a class="skip-link" href="#main">Skip to fixtures</a>
+  <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="site-header-inner">
       <h1><a href="/">⚽ World Cup 2026</a></h1>
@@ -228,7 +240,7 @@
 {{end}}
 
 {{define "sidebar"}}
-    <aside class="sidebar">
+    <aside class="sidebar" aria-label="Groups and teams">
       <div class="sidebar-top">
         <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="sidebar-nav">
           <svg class="burger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
@@ -266,7 +278,7 @@
         <div class="card-top">
           <div class="meta">
             <span class="stage">{{.StageName}}</span>
-            {{if .Live}}<span class="live-badge"><span class="live-dot"></span>LIVE</span>{{else}}<time class="kickoff" datetime="{{.KickoffUTC}}">{{.KickoffUTC}}</time>{{end}}
+            {{if .Live}}<span class="live-badge"><span class="live-dot"></span>LIVE</span>{{else}}<time class="kickoff" datetime="{{.KickoffUTC}}">{{.KickoffLabel}}</time>{{end}}
           </div>
           {{if .GroupName}}<a class="group" href="{{.GroupURL}}">{{.GroupName}}</a>{{end}}
         </div>
@@ -309,7 +321,7 @@
     <footer>
       <p class="state">
         Last updated
-        {{if .LastSyncedUTC}}<time datetime="{{.LastSyncedUTC}}">{{.LastSyncedUTC}}</time>{{else}}never{{end}}.
+        {{if .LastSyncedUTC}}<time datetime="{{.LastSyncedUTC}}">{{.LastSyncedLabel}}</time>{{else}}never{{end}}.
         Times shown in your local timezone.
       </p>
     </footer>
