@@ -16,11 +16,9 @@ Named in tribute to the late, great [John Motson](https://en.wikipedia.org/wiki/
 
 ## Add it to your calendar
 
-Subscribe once and the whole tournament lands in your calendar, updating itself automatically as fixtures move and scores come in — event titles even carry the final score once a match is done.
+Subscribe once and the whole tournament lands in your calendar, updating itself automatically as fixtures move and scores come in — event titles even carry the final score once a match is done. Works with Apple Calendar, Google Calendar, and anything else that speaks iCalendar.
 
-### → [webcal://motson.jamesmaggs.com/calendar.ics](webcal://motson.jamesmaggs.com/calendar.ics)
-
-Works with Apple Calendar, Google Calendar, and anything else that speaks iCalendar.
+- **Subscribe** — [webcal://motson.jamesmaggs.com/calendar.ics](webcal://motson.jamesmaggs.com/calendar.ics)
 
 ---
 
