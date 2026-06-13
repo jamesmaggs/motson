@@ -288,6 +288,17 @@ func TestStaticAssetsAreLongLivedCacheable(t *testing.T) {
 	}
 }
 
+// The Umami analytics snippet is present on every page (shared head).
+func TestPagesIncludeAnalytics(t *testing.T) {
+	for _, path := range []string{"/", "/groups/A", "/teams/canada"} {
+		body := get(t, groupA(t), now, path).Body.String()
+		if !strings.Contains(body, `src="https://analytics.jamesmaggs.com/script.js"`) ||
+			!strings.Contains(body, `data-website-id="03b42a62-4e61-4729-8345-882093197d3b"`) {
+			t.Errorf("%s: analytics script missing", path)
+		}
+	}
+}
+
 func TestPageMarksCancelledAndPostponedMatches(t *testing.T) {
 	cancelled := match("wc-1")
 	cancelled.Status = fixtures.StatusCancelled
