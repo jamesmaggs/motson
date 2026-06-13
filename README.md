@@ -19,3 +19,7 @@ Named in tribute to the late, great [John Motson](https://en.wikipedia.org/wiki/
 Subscribe once and the whole tournament lands in your calendar, updating itself automatically as fixtures move and scores come in — event titles even carry the final score once a match is done. Works with Apple Calendar, Google Calendar, and anything else that speaks iCalendar.
 
 - **Subscribe** — [webcal://motson.jamesmaggs.com/calendar.ics](webcal://motson.jamesmaggs.com/calendar.ics)
+
+## Where the data comes from
+
+Fixtures, scores and standings are sourced from [football-data.org](https://www.football-data.org) and refreshed every 10 minutes, so kick-offs, results and tables stay current throughout the tournament. Motson keeps its own copy of the data, so the site and your calendar feed keep working even if the provider has a wobble.
