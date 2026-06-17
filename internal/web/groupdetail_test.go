@@ -77,7 +77,10 @@ func TestGroupDetailMatchesAreCardsAndTableIsCarded(t *testing.T) {
 func TestGroupDetailStandingsContent(t *testing.T) {
 	body := get(t, groupA(t), now, "/groups/A").Body.String()
 
-	canada, mexico := strings.Index(body, ">Canada"), strings.Index(body, ">Mexico")
+	// Scope to the standings card: the nav menu also names both teams, in
+	// FIFA-ranking order, which is not the standings order under test.
+	standings := body[strings.Index(body, `class="standings-card"`):]
+	canada, mexico := strings.Index(standings, ">Canada"), strings.Index(standings, ">Mexico")
 	if canada < 0 || mexico < 0 || canada > mexico {
 		t.Errorf("Canada (3pts) should precede Mexico in standings")
 	}

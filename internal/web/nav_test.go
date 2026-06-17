@@ -78,17 +78,29 @@ func TestSidebarHasCollapseToggle(t *testing.T) {
 	}
 }
 
-// Sidebar teams are alphabetical and unnamed sides are excluded.
-func TestSidebarTeamsAlphabeticalAndNamed(t *testing.T) {
+// Sidebar teams are ordered by FIFA world ranking (MenuOrder guarantee);
+// unranked names follow the ranked ones alphabetically, and unnamed sides
+// are excluded.
+func TestSidebarTeamsByRankingAndNamed(t *testing.T) {
+	// Base match is Mexico (rank 14) vs Canada (rank 30): ranking order
+	// inverts the alphabetical order, so this discriminates the two.
+	unranked := withID(match("wc-unranked"), "wc-unranked")
+	unranked.GroupName = "Group A"
+	unranked.HomeTeam, unranked.AwayTeam = "Suriname", "Indonesia" // neither in the ranking snapshot
 	tbc := withID(match("wc-final"), "wc-final")
 	tbc.Stage, tbc.GroupName = fixtures.StageFinal, ""
 	tbc.HomeTeam, tbc.AwayTeam = "", ""
-	body := get(t, seeded(t, match("wc-a1"), tbc), now, "/").Body.String()
+	body := get(t, seeded(t, match("wc-a1"), unranked, tbc), now, "/").Body.String()
 
 	sidebar := body[strings.Index(body, `class="nav-teams"`):]
 	sidebar = sidebar[:strings.Index(sidebar, "</ul>")]
-	if canada, mexico := strings.Index(sidebar, "Canada"), strings.Index(sidebar, "Mexico"); canada < 0 || mexico < 0 || canada > mexico {
-		t.Errorf("sidebar teams not alphabetical: %s", sidebar)
+	order := []string{"Mexico", "Canada", "Indonesia", "Suriname"}
+	for i := 1; i < len(order); i++ {
+		prev, cur := strings.Index(sidebar, order[i-1]), strings.Index(sidebar, order[i])
+		if prev < 0 || cur < 0 || prev > cur {
+			t.Errorf("sidebar order wrong: want %v, got %s", order, sidebar)
+			break
+		}
 	}
 	if strings.Contains(sidebar, "TBC") {
 		t.Errorf("sidebar must not list unnamed sides")

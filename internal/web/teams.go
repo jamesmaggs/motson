@@ -29,7 +29,9 @@ type teamEntry struct {
 	URL  string
 }
 
-// collectTeams lists every named team exactly once, alphabetically.
+// collectTeams lists every named team exactly once, ordered by FIFA world
+// ranking (the MenuOrder guarantee). Teams with no known ranking follow the
+// ranked ones, alphabetically among themselves.
 func collectTeams(matches []fixtures.Match) []teamEntry {
 	seen := map[string]bool{}
 	var teams []teamEntry
@@ -42,7 +44,17 @@ func collectTeams(matches []fixtures.Match) []teamEntry {
 			teams = append(teams, teamEntry{Name: name, Flag: flagFor(name), URL: teamURL(name)})
 		}
 	}
-	sort.Slice(teams, func(i, j int) bool { return teams[i].Name < teams[j].Name })
+	sort.Slice(teams, func(i, j int) bool {
+		ri, iok := rankOf(teams[i].Name)
+		rj, jok := rankOf(teams[j].Name)
+		if iok != jok {
+			return iok // ranked teams sort ahead of unranked ones
+		}
+		if iok && ri != rj {
+			return ri < rj
+		}
+		return teams[i].Name < teams[j].Name
+	})
 	return teams
 }
 

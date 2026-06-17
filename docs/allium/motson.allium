@@ -272,6 +272,15 @@ surface FixturesPage {
         -- Every named team's name links to its TeamDetailPage;
         -- unnamed (TBC) sides do not link.
 
+    @guarantee MenuOrder
+        -- The navigation menu lists every named team exactly once,
+        -- ordered by FIFA men's world ranking from a fixed
+        -- pre-tournament snapshot that does not update during the
+        -- tournament (presentation metadata, like the team flags).
+        -- Teams whose name has no known ranking follow all ranked
+        -- teams, ordered alphabetically among themselves. Unnamed
+        -- (TBC) sides never appear.
+
     @guidance
         -- Matches are presented as cards in kickoff order: stage and
         -- kickoff time top-left, the group (a link to its
