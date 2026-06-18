@@ -67,7 +67,7 @@
     /* Rows size to their own content (cards in a row still match height
        via the default stretch); avoids stretching every card to the
        tallest in the whole grid, which left unplayed cards half-empty. */
-    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; margin: 0 0 2.5rem; }
+    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; margin: 0 0 2.5rem; }
     /* Top-align content so cards stretched to a taller row-mate (e.g. a
        team name that wraps) keep their heads level; slack falls before the
        venue, which is pinned to the bottom (.venue-row margin-top:auto). */
@@ -105,7 +105,7 @@
     .day { margin: 0 0 2.5rem; }
     .day:last-child { margin-bottom: 0; }
     .day .cards { margin: 0; }
-    .day-title { margin: 0 0 .9rem; font-size: 1.05rem; font-weight: 400; color: var(--ink); }
+    .day-title { margin: 0 0 1.5rem; font-size: 1.05rem; font-weight: 400; color: var(--ink); }
     /* Featured "Next Match" spotlight at the top of the index: a card
        wrapper (like the standings card) holding a title and one match;
        the inner match card sheds its own chrome to avoid a card-in-card. */
@@ -171,7 +171,7 @@
     .site-header h1 { margin: 0 0 1.2rem; }
     .site-header h1 a { color: inherit; text-decoration: none; }
     .site-header .mascot { height: 6rem; width: auto; display: block; }
-    .layout { display: flex; gap: 1rem; max-width: 1180px; margin: 0 auto; padding: 1.5rem; align-items: flex-start; }
+    .layout { display: flex; gap: 1.5rem; max-width: 1180px; margin: 0 auto; padding: 1.5rem; align-items: flex-start; }
     .content { flex: 1 1 auto; min-width: 0; }
     /* The sidebar scrolls with the page so the full team list is reachable.
        Its background sits between the page (var(--bg)) and the cards (var(--surface)). */
