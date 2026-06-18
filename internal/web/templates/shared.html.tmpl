@@ -77,9 +77,8 @@
     .meta { display: flex; flex-direction: column; gap: .25rem; }
     .stage { text-transform: uppercase; font-size: .62rem; letter-spacing: .1em; color: var(--muted); }
     .kickoff { color: var(--ink); font-size: .72rem; }
-    /* UK broadcaster badge (BBC/ITV) — understated, centred under the venue. */
-    .broadcast { text-align: center; margin-top: .5rem; }
-    .tv { display: inline-block; font-size: .58rem; font-weight: 700; letter-spacing: .08em; padding: .1rem .4rem; border-radius: 4px; border: 1px solid var(--border); color: var(--muted); }
+    /* UK broadcaster badge (BBC/ITV) — understated, on the venue line. */
+    .tv { font-size: .58rem; font-weight: 700; letter-spacing: .08em; padding: .1rem .4rem; border-radius: 4px; border: 1px solid var(--border); color: var(--muted); }
     .group { font-size: .72rem; padding: .2rem .65rem; border-radius: 999px; background: rgba(var(--green-rgb),.16); color: var(--green-text); white-space: nowrap; text-decoration: none; }
     .group:hover { background: rgba(var(--green-rgb),.28); }
     .scoreline { display: grid; grid-template-columns: 1fr auto 1fr; align-items: start; gap: .5rem; }
@@ -93,7 +92,8 @@
     .score .sep { margin: 0 .3rem; color: var(--muted); font-weight: 400; }
     .vs { font-size: 1.1rem; color: var(--muted); padding-top: .9rem; }
     .pens { display: block; font-size: .68rem; font-weight: 400; color: var(--muted); margin-top: .2rem; }
-    .venue { text-align: center; color: var(--muted); font-size: .72rem; margin-top: .9rem; }
+    .venue-row { display: flex; justify-content: center; align-items: center; gap: .5rem; margin-top: .9rem; }
+    .venue { color: var(--muted); font-size: .72rem; }
     .status { text-align: center; color: var(--muted); font-size: .72rem; margin-top: .9rem; }
     .empty { color: var(--muted); padding: 2rem 0; }
     /* Fixtures grouped by matchday: a date heading before each day's cards. */
@@ -280,8 +280,7 @@
             {{if .AwayURL}}<a class="team" href="{{.AwayURL}}"><span class="flag">{{.AwayFlag}}</span><span class="name">{{.AwayTeam}}</span></a>{{else}}<span class="flag">{{.AwayFlag}}</span><span class="name">{{.AwayTeam}}</span>{{end}}
           </div>
         </div>
-        {{if .Venue}}<div class="venue">{{.Venue}}</div>{{end}}
-        {{if .Broadcaster}}<div class="broadcast"><span class="tv tv-{{.Broadcaster}}">{{.Broadcaster}}</span></div>{{end}}
+        {{if or .Venue .Broadcaster}}<div class="venue-row">{{if .Venue}}<span class="venue">{{.Venue}}</span>{{end}}{{if .Broadcaster}}<span class="tv tv-{{.Broadcaster}}">{{.Broadcaster}}</span>{{end}}</div>{{end}}
         {{if and .StatusLabel (not .Live)}}<div class="status">{{.StatusLabel}}</div>{{end}}
       </article>
 {{end}}
