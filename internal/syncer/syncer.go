@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/jamesmaggs/motson/internal/fixtures"
+	"github.com/jamesmaggs/motson/internal/venues"
 )
 
 // Source is the FixtureSource contract: one call returns the complete
@@ -45,6 +46,8 @@ func (s *Syncer) RunDue(ctx context.Context, now time.Time) error {
 	if err != nil {
 		return fmt.Errorf("fetching fixtures: %w", err)
 	}
+	// The provider's free tier omits venues; fill them from static data.
+	matches = venues.Enrich(matches)
 	if err := s.store.ReplaceAll(ctx, matches, now); err != nil {
 		return fmt.Errorf("applying snapshot: %w", err)
 	}

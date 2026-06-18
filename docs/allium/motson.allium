@@ -41,8 +41,11 @@ value ProviderFixture {
     home_team: String
     away_team: String
     kickoff_at: Timestamp
-    -- The provider does not reliably supply venues; absent venues are
-    -- tolerated and surfaces omit them gracefully.
+    -- The provider does not reliably supply venues; where it leaves one
+    -- absent, sync backfills it from a static built-in table of 2026
+    -- venues keyed by provider_match_id (see VenueEnrichment). Venues
+    -- still unknown after that are tolerated and surfaces omit them
+    -- gracefully.
     venue: String?
     stage: group | round_of_32 | round_of_16 | quarter_final | semi_final | third_place | final
     group_name: String?
@@ -158,6 +161,16 @@ rule FixtureDataApplied {
             ensures: match.away_score = fixture.away_score
             ensures: match.home_penalties = fixture.home_penalties
             ensures: match.away_penalties = fixture.away_penalties
+    @guidance
+        -- VenueEnrichment: before a fixture is stored, its venue is
+        -- filled by precedence — the provider's venue wins; if the
+        -- provider left it empty, the static built-in table of 2026
+        -- World Cup venues (keyed by provider_match_id) supplies it;
+        -- if neither has one it stays empty and surfaces omit it
+        -- gracefully. The table is a fixed pre-tournament dataset
+        -- (presentation metadata, like the team flags and FIFA
+        -- ranking), not synced data: it never adds, removes or alters
+        -- any match or any other field.
 }
 
 rule VanishedMatchesRemoved {

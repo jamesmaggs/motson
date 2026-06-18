@@ -63,6 +63,27 @@ func TestSyncDoesNothingBeforeDeadline(t *testing.T) {
 	}
 }
 
+// VenueEnrichment: sync backfills an empty venue from the static table
+// (provider id 537390 is the final at MetLife) before storing.
+func TestSyncEnrichesMissingVenue(t *testing.T) {
+	ctx := context.Background()
+	src := &fakeSource{matches: []fixtures.Match{match("537390")}} // no venue from provider
+	st := store.NewMemory()
+	s := syncer.New(src, st)
+	if err := st.ScheduleNextSync(ctx, now); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := s.RunDue(ctx, now); err != nil {
+		t.Fatal(err)
+	}
+
+	matches, _ := st.Matches(ctx)
+	if len(matches) != 1 || matches[0].Venue != "MetLife Stadium, New York New Jersey" {
+		t.Errorf("venue not enriched on sync, got %q", matches[0].Venue)
+	}
+}
+
 // Obligations: rule-success.SyncDue, rule-success.FixtureDataApplied —
 // at the deadline the schedule advances by sync_interval and the
 // snapshot is applied.
