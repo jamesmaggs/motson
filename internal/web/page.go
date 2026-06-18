@@ -116,6 +116,7 @@ type matchView struct {
 	Pens         string // "4–2 pens" for a finished shootout, else empty
 	StatusLabel  string // "In play", "Postponed", "Cancelled" or empty
 	Live         bool   // match in progress — shown with a LIVE badge
+	Broadcaster  string // UK channel ("BBC"/"ITV"), empty when not yet known
 	AriaLabel    string // accessible name summarising the card for screen readers
 }
 
@@ -272,6 +273,7 @@ func viewOf(m fixtures.Match) matchView {
 		StageName:    m.Stage.Label(),
 		StatusLabel:  stateLabels[m.Status],
 		Live:         m.Status == fixtures.StatusInPlay,
+		Broadcaster:  broadcasterFor(m.ProviderMatchID),
 	}
 	// Group-stage cards carry a pill linking to the group page; knockout
 	// cards (no group_name) carry none.

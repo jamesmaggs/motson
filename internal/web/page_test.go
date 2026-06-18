@@ -194,6 +194,22 @@ func TestIndexHidesCountdownWhenMatchUnderway(t *testing.T) {
 	}
 }
 
+// Each group match card carries a UK broadcaster badge (BBC/ITV).
+func TestCardShowsUKBroadcasterBadge(t *testing.T) {
+	body := get(t, seeded(t, match("537409")), now, "/").Body.String() // England v Croatia — ITV
+	if !strings.Contains(body, `<span class="tv tv-ITV">ITV</span>`) {
+		t.Errorf("match card missing UK broadcaster badge: %s", body)
+	}
+}
+
+// Matches without a known channel (knockouts, until announced) show no badge.
+func TestCardOmitsBroadcasterWhenUnknown(t *testing.T) {
+	body := get(t, seeded(t, match("no-channel")), now, "/").Body.String()
+	if strings.Contains(body, `class="tv`) {
+		t.Errorf("match with no known broadcaster should have no TV badge: %s", body)
+	}
+}
+
 // Scores appear only once a match is finished; an in-play match shows
 // "vs" and an "In play" label, not a score.
 func TestPageShowsScoreOnlyWhenFinished(t *testing.T) {

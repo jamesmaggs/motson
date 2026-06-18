@@ -285,6 +285,17 @@ surface FixturesPage {
         -- Every named team's name links to its TeamDetailPage;
         -- unnamed (TBC) sides do not link.
 
+    @guarantee UKBroadcaster
+        -- Each match card shows a small badge naming the UK free-to-air
+        -- channel airing the game ("BBC" or "ITV"), from a fixed
+        -- pre-tournament snapshot of the published UK TV listings keyed
+        -- by provider_match_id (presentation metadata, like the team
+        -- flags and FIFA ranking). Only group-stage matches have an
+        -- announced channel; a match with none yet (the knockouts)
+        -- shows no badge, omitted gracefully like an unknown venue.
+        -- England's games simulcast on both networks show the listed
+        -- lead channel.
+
     @guarantee MenuOrder
         -- The navigation menu lists every named team exactly once,
         -- ordered by FIFA men's world ranking from a fixed
