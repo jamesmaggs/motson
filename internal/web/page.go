@@ -35,7 +35,8 @@ var staticFS embed.FS
 var templates = template.Must(template.ParseFS(templateFS, "templates/*.tmpl"))
 
 type pageData struct {
-	Featured        *matchView // the spotlighted live/next match, nil when none
+	Featured        *matchView     // the spotlighted live/next match, nil when none
+	Countdown       *countdownView // time until the next match; nil when none or live
 	Days            []dayGroup
 	LastSyncedUTC   string
 	LastSyncedLabel string
@@ -137,6 +138,12 @@ func page(store fixtures.Store, host string, clock func() time.Time) http.Handle
 		if fm, ok := featuredMatch(matches, clock()); ok {
 			v := viewOf(fm)
 			data.Featured = &v
+			// Count down to kickoff for the next match — but not once it is
+			// under way (the live spotlight carries no countdown).
+			if !v.Live {
+				cd := countdownTo(fm.KickoffAt, clock())
+				data.Countdown = &cd
+			}
 		}
 		data.Days = groupByDay(matches)
 
@@ -167,6 +174,33 @@ func featuredMatch(matches []fixtures.Match, now time.Time) (fixtures.Match, boo
 		}
 	}
 	return best, found
+}
+
+// countdownView is the time remaining until a match kicks off, split into
+// days/hours/minutes/seconds for the spotlight countdown. It is a server
+// snapshot (the no-JS fallback); the client then ticks it down each second
+// from TargetUTC (ADR 0010).
+type countdownView struct {
+	TargetUTC string // kickoff instant, ISO 8601 UTC — the client's countdown target
+	Days      string
+	Hours     string // zero-padded to two digits
+	Mins      string
+	Secs      string
+}
+
+// countdownTo is the remaining time from now until target, clamped at zero.
+func countdownTo(target, now time.Time) countdownView {
+	secs := int(target.Sub(now).Seconds())
+	if secs < 0 {
+		secs = 0
+	}
+	return countdownView{
+		TargetUTC: target.UTC().Format(time.RFC3339),
+		Days:      fmt.Sprintf("%d", secs/86400),
+		Hours:     fmt.Sprintf("%02d", (secs%86400)/3600),
+		Mins:      fmt.Sprintf("%02d", (secs%3600)/60),
+		Secs:      fmt.Sprintf("%02d", secs%60),
+	}
 }
 
 func lastSynced(state fixtures.SyncState) string {

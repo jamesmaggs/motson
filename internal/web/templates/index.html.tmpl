@@ -10,6 +10,14 @@
     <section class="featured{{if .Live}} live{{end}}" aria-label="{{if .Live}}Match in progress{{else}}Next match{{end}}">
       <h2 class="featured-title">{{if .Live}}Live now{{else}}Next Match{{end}}</h2>
       {{template "matchCard" .}}
+      {{with $.Countdown}}
+      <div class="countdown" role="timer" aria-label="Countdown to kick-off" data-countdown="{{.TargetUTC}}">
+        <div class="cd-unit"><span class="cd-num" data-unit="days">{{.Days}}</span><span class="cd-label">Days</span></div>
+        <div class="cd-unit"><span class="cd-num" data-unit="hours">{{.Hours}}</span><span class="cd-label">Hrs</span></div>
+        <div class="cd-unit"><span class="cd-num" data-unit="mins">{{.Mins}}</span><span class="cd-label">Min</span></div>
+        <div class="cd-unit"><span class="cd-num" data-unit="secs">{{.Secs}}</span><span class="cd-label">Sec</span></div>
+      </div>
+      {{end}}
     </section>
     {{end}}
     {{if .Days}}

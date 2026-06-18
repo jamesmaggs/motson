@@ -150,6 +150,50 @@ func TestIndexGroupsFixturesByDate(t *testing.T) {
 	}
 }
 
+// FeaturedMatch: the next-match spotlight carries a countdown to kickoff,
+// rendered server-side (days/hours/mins/secs) and pointed at the kickoff.
+func TestIndexShowsCountdownToNextMatch(t *testing.T) {
+	upcoming := match("wc-next")
+	upcoming.KickoffAt = now.Add(2*24*time.Hour + 2*time.Hour + 30*time.Minute + 45*time.Second)
+
+	body := get(t, seeded(t, upcoming), now, "/").Body.String()
+	feat := featuredSection(t, body)
+
+	if !strings.Contains(feat, `class="countdown"`) {
+		t.Fatalf("countdown missing from next-match spotlight: %s", feat)
+	}
+	for _, want := range []string{
+		`data-unit="days">2<`,
+		`data-unit="hours">02<`,
+		`data-unit="mins">30<`,
+		`data-unit="secs">45<`,
+	} {
+		if !strings.Contains(feat, want) {
+			t.Errorf("countdown missing %q: %s", want, feat)
+		}
+	}
+	if want := `data-countdown="` + upcoming.KickoffAt.UTC().Format(time.RFC3339) + `"`; !strings.Contains(feat, want) {
+		t.Errorf("countdown should target the next match kickoff (%s): %s", want, feat)
+	}
+}
+
+// FeaturedMatch: no countdown once the match is under way.
+func TestIndexHidesCountdownWhenMatchUnderway(t *testing.T) {
+	live := match("wc-live")
+	live.Status = fixtures.StatusInPlay
+	live.KickoffAt = now.Add(-time.Hour)
+
+	body := get(t, seeded(t, live), now, "/").Body.String()
+	feat := featuredSection(t, body)
+
+	if strings.Contains(feat, `class="countdown"`) {
+		t.Errorf("countdown should not show once the match is underway: %s", feat)
+	}
+	if !strings.Contains(feat, "Live now") {
+		t.Errorf("expected the live spotlight: %s", feat)
+	}
+}
+
 // Scores appear only once a match is finished; an in-play match shows
 // "vs" and an "In play" label, not a score.
 func TestPageShowsScoreOnlyWhenFinished(t *testing.T) {

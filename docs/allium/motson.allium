@@ -289,7 +289,15 @@ surface FixturesPage {
         -- spotlight is an additional highlighted copy above the list;
         -- the same match also appears in the fixtures list below, in
         -- its usual kickoff position. When none is in play or upcoming,
-        -- no spotlight card is shown.
+        -- no spotlight card is shown. When the spotlight is the next
+        -- (upcoming, not-yet-started) match, it also shows a countdown
+        -- to kickoff in days, hours, minutes and seconds, derived from
+        -- the match's kickoff_at relative to now. The countdown is not
+        -- shown once a match is in play. The server renders an initial
+        -- countdown (as of page load) that stands without scripting;
+        -- client JS then ticks it down each second from the kickoff
+        -- target, the same client-over-server pattern used to localise
+        -- kickoff times (see DatedFixtures).
 
     @guarantee DatedFixtures
         -- The fixtures list is segmented into consecutive day groups,
