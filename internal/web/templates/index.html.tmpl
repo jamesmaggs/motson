@@ -6,6 +6,12 @@
   <div class="layout">
     {{template "sidebar" .Nav}}
     <main class="content" id="main" tabindex="-1">
+    {{with .Featured}}
+    <section class="featured{{if .Live}} live{{end}}" aria-label="{{if .Live}}Match in progress{{else}}Next match{{end}}">
+      <h2 class="featured-title">{{if .Live}}Live now{{else}}Next Match{{end}}</h2>
+      {{template "matchCard" .}}
+    </section>
+    {{end}}
     {{if .Matches}}
     <div class="cards">
       {{range .Matches}}{{template "matchCard" .}}{{end}}

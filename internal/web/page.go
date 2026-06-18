@@ -35,6 +35,7 @@ var staticFS embed.FS
 var templates = template.Must(template.ParseFS(templateFS, "templates/*.tmpl"))
 
 type pageData struct {
+	Featured        *matchView // the spotlighted live/next match, nil when none
 	Matches         []matchView
 	LastSyncedUTC   string
 	LastSyncedLabel string
@@ -124,7 +125,7 @@ var stateLabels = map[fixtures.Status]string{
 	fixtures.StatusCancelled: "Cancelled",
 }
 
-func page(store fixtures.Store, host string) http.HandlerFunc {
+func page(store fixtures.Store, host string, clock func() time.Time) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		matches, state, ok := loadFixtures(w, r, store)
 		if !ok {
@@ -132,10 +133,41 @@ func page(store fixtures.Store, host string) http.HandlerFunc {
 		}
 
 		data := pageData{AssetVersion: assetVersion, LastSyncedUTC: lastSynced(state), LastSyncedLabel: syncedLabel(state), Nav: buildNav(matches, host)}
+		// Spotlight the live or next match above the list; it also stays in
+		// the kickoff-ordered list below (the FeaturedMatch guarantee).
+		if fm, ok := featuredMatch(matches, clock()); ok {
+			v := viewOf(fm)
+			data.Featured = &v
+		}
 		data.Matches, data.HasVenues = buildViews(matches)
 
 		render(w, "index.html.tmpl", data)
 	}
+}
+
+// featuredMatch is the match the index spotlights above the list: the one
+// in progress, or — when none is — the next still to kick off (the
+// scheduled match with the earliest kickoff at or after now). The second
+// return is false when neither exists.
+func featuredMatch(matches []fixtures.Match, now time.Time) (fixtures.Match, bool) {
+	var best fixtures.Match
+	found := false
+	// A match in progress is "current": prefer it, earliest kickoff first.
+	for _, m := range matches {
+		if m.Status == fixtures.StatusInPlay && (!found || m.KickoffAt.Before(best.KickoffAt)) {
+			best, found = m, true
+		}
+	}
+	if found {
+		return best, true
+	}
+	// Otherwise the soonest scheduled match still to kick off.
+	for _, m := range matches {
+		if m.Status == fixtures.StatusScheduled && !m.KickoffAt.Before(now) && (!found || m.KickoffAt.Before(best.KickoffAt)) {
+			best, found = m, true
+		}
+	}
+	return best, found
 }
 
 func lastSynced(state fixtures.SyncState) string {

@@ -281,14 +281,25 @@ surface FixturesPage {
         -- teams, ordered alphabetically among themselves. Unnamed
         -- (TBC) sides never appear.
 
+    @guarantee FeaturedMatch
+        -- The page leads with a single spotlighted match in its own
+        -- titled card above the fixtures list: the match in play (the
+        -- earliest by kickoff if several are), else the next still to
+        -- kick off (the earliest scheduled match at or after now). The
+        -- spotlight is an additional highlighted copy above the list;
+        -- the same match also appears in the fixtures list below, in
+        -- its usual kickoff position. When none is in play or upcoming,
+        -- no spotlight card is shown.
+
     @guidance
         -- Matches are presented as cards in kickoff order: stage and
-        -- kickoff time top-left, the group (a link to its
-        -- GroupDetailPage) top-right, and the score — or "vs" before
-        -- kick-off — flanked by each team's flag and name. Knockout
-        -- cards carry no group. Venue, when present, sits with the
-        -- score. An in-progress match's card is distinguished
-        -- visually (in place of an explicit status label).
+        -- kickoff time
+        -- top-left, the group (a link to its GroupDetailPage)
+        -- top-right, and the score — or "vs" before kick-off — flanked
+        -- by each team's flag and name. Knockout cards carry no group.
+        -- Venue, when present, sits with the score. An in-progress
+        -- match's card is distinguished visually (in place of an
+        -- explicit status label).
 
     related:
         GroupDetailPage(schedule)

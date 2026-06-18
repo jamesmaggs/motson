@@ -16,7 +16,7 @@ import (
 // supplies "now" so staleness is testable.
 func NewHandler(store fixtures.Store, host string, clock func() time.Time) http.Handler {
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /{$}", page(store, host))
+	mux.HandleFunc("GET /{$}", page(store, host, clock))
 	mux.HandleFunc("GET /groups/{group}", groupDetail(store, host))
 	mux.HandleFunc("GET /teams/{team}", teamDetail(store, host))
 	mux.HandleFunc("GET /healthz", healthz(store, clock))

@@ -93,6 +93,13 @@
     .venue { text-align: center; color: var(--muted); font-size: .72rem; margin-top: .9rem; }
     .status { text-align: center; color: var(--muted); font-size: .72rem; margin-top: .9rem; }
     .empty { color: var(--muted); padding: 2rem 0; }
+    /* Featured "Next Match" spotlight at the top of the index: a card
+       wrapper (like the standings card) holding a title and one match;
+       the inner match card sheds its own chrome to avoid a card-in-card. */
+    .featured { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1rem 1.1rem; margin: 0 0 2rem; }
+    .featured.live { border-color: rgba(var(--green-rgb),.55); }
+    .featured-title { margin: 0 0 .6rem; font-size: 1.5rem; }
+    .featured .card { border: 0; background: transparent; border-radius: 0; padding: 0; }
 
     /* Error page (404 / 500): centred, self-contained, no sidebar. */
     .error-page { max-width: 1180px; margin: 0 auto; padding: 4rem 1.5rem; text-align: center; }

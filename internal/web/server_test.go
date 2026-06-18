@@ -61,6 +61,35 @@ func mainContent(body string) string {
 	return body[i:j]
 }
 
+// featuredSection returns the index page's "Next Match" spotlight markup
+// (the <section class="featured">…</section>), failing if it is absent.
+func featuredSection(t *testing.T, body string) string {
+	t.Helper()
+	i := strings.Index(body, `<section class="featured`)
+	if i < 0 {
+		t.Fatalf("no featured spotlight in page: %s", body)
+	}
+	j := strings.Index(body[i:], "</section>")
+	if j < 0 {
+		t.Fatalf("featured spotlight not closed: %s", body)
+	}
+	return body[i : i+j]
+}
+
+// withoutFeatured strips the spotlight section, leaving the fixtures grid —
+// so per-match counts ignore the spotlight's duplicate copy.
+func withoutFeatured(body string) string {
+	i := strings.Index(body, `<section class="featured`)
+	if i < 0 {
+		return body
+	}
+	j := strings.Index(body[i:], "</section>")
+	if j < 0 {
+		return body
+	}
+	return body[:i] + body[i+j+len("</section>"):]
+}
+
 // Guarantee: StalenessIsUnhealthy — healthy while fresh.
 func TestHealthzHealthyWhenFresh(t *testing.T) {
 	rec := get(t, seeded(t, match("wc-1")), now.Add(time.Hour), "/healthz")

@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/jamesmaggs/motson/internal/fixtures"
 )
@@ -33,6 +34,85 @@ func TestPageEmitsKickoffAsUTCDatetime(t *testing.T) {
 	body := get(t, seeded(t, match("wc-1")), now, "/").Body.String()
 	if !strings.Contains(body, `datetime="2026-06-13T18:00:00Z"`) {
 		t.Errorf("page missing UTC datetime attribute for kickoff: %s", body)
+	}
+}
+
+// FeaturedMatch: the index spotlights the next match to kick off in a
+// titled card above the fixtures, and that match still appears in the list.
+func TestIndexSpotlightsNextMatch(t *testing.T) {
+	finished := match("wc-done")
+	finished.Status = fixtures.StatusFinished
+	finished.HomeScore, finished.AwayScore = intp(1), intp(0)
+	finished.KickoffAt = now.Add(-24 * time.Hour)
+
+	upcoming := withID(match("wc-next"), "wc-next")
+	upcoming.HomeTeam, upcoming.AwayTeam = "Spain", "France"
+	upcoming.KickoffAt = now.Add(2 * time.Hour)
+
+	body := get(t, seeded(t, finished, upcoming), now, "/").Body.String()
+	feat := featuredSection(t, body)
+
+	if !strings.Contains(feat, "Next Match") {
+		t.Errorf("spotlight missing its 'Next Match' title: %s", feat)
+	}
+	if !strings.Contains(feat, "Spain") || !strings.Contains(feat, "France") {
+		t.Errorf("spotlight should show the next match (Spain v France): %s", feat)
+	}
+	if strings.Contains(feat, "Canada") {
+		t.Errorf("spotlight should not show the finished match: %s", feat)
+	}
+	// The spotlight sits above the fixtures grid.
+	if i, j := strings.Index(body, `class="featured`), strings.Index(body, `class="cards"`); i < 0 || j < 0 || i > j {
+		t.Errorf("spotlight should come before the fixtures grid: %s", body)
+	}
+	// It is a duplicate: the next match also appears in the list below.
+	if got := strings.Count(body, `<span class="name">Spain</span>`); got != 2 {
+		t.Errorf("next match should appear in both the spotlight and the list, got %d: %s", got, body)
+	}
+}
+
+// FeaturedMatch: a match in progress is spotlighted ahead of any upcoming
+// one, with a live title and the live treatment.
+func TestIndexSpotlightsLiveMatchWhenUnderway(t *testing.T) {
+	live := withID(match("wc-live"), "wc-live")
+	live.HomeTeam, live.AwayTeam = "Brazil", "Argentina"
+	live.Status = fixtures.StatusInPlay
+	live.KickoffAt = now.Add(-time.Hour)
+
+	upcoming := withID(match("wc-soon"), "wc-soon")
+	upcoming.HomeTeam, upcoming.AwayTeam = "Spain", "France"
+	upcoming.KickoffAt = now.Add(time.Hour)
+
+	body := get(t, seeded(t, live, upcoming), now, "/").Body.String()
+	feat := featuredSection(t, body)
+
+	if !strings.Contains(feat, "Brazil") || !strings.Contains(feat, "Argentina") {
+		t.Errorf("spotlight should show the in-play match: %s", feat)
+	}
+	if strings.Contains(feat, "Spain") {
+		t.Errorf("spotlight should prefer the live match over the upcoming one: %s", feat)
+	}
+	if !strings.Contains(feat, "Live now") {
+		t.Errorf("spotlight title should reflect the live match: %s", feat)
+	}
+	if !strings.Contains(feat, "featured live") {
+		t.Errorf("live spotlight should carry the live class: %s", feat)
+	}
+}
+
+// FeaturedMatch: no spotlight when nothing is in play or still to come.
+func TestIndexHasNoSpotlightWhenNothingLiveOrUpcoming(t *testing.T) {
+	done := match("wc-old")
+	done.Status = fixtures.StatusFinished
+	done.HomeScore, done.AwayScore = intp(2), intp(0)
+	done.KickoffAt = now.Add(-48 * time.Hour)
+
+	body := get(t, seeded(t, done), now, "/").Body.String()
+	if strings.Contains(body, `class="featured`) {
+		t.Errorf("no spotlight expected when no match is live or upcoming: %s", body)
+	}
+	if !strings.Contains(body, `class="cards"`) {
+		t.Errorf("finished fixtures should still appear in the list: %s", body)
 	}
 }
 
@@ -150,7 +230,8 @@ func TestUnnamedTeamsRenderAsTBC(t *testing.T) {
 	m.HomeTeam, m.AwayTeam = "", ""
 
 	body := get(t, seeded(t, m), now, "/").Body.String()
-	if got := strings.Count(body, `<span class="name">TBC</span>`); got != 2 {
+	// Scope to the fixtures grid; the spotlight repeats this same match.
+	if got := strings.Count(withoutFeatured(body), `<span class="name">TBC</span>`); got != 2 {
 		t.Errorf("got %d visible TBC placeholders, want 2: %s", got, body)
 	}
 	// No flag emoji in the visible card body (ignore the aria-label text).
@@ -189,10 +270,13 @@ func TestPageRendersMatchesAsCards(t *testing.T) {
 
 	body := get(t, seeded(t, finished, upcoming), now, "/").Body.String()
 
-	if got := strings.Count(body, `class="card"`); got != 2 {
+	// Scope to the fixtures grid: the spotlight at the top is a separate
+	// highlighted copy of one match, not part of the per-match list.
+	grid := withoutFeatured(body)
+	if got := strings.Count(grid, `class="card"`); got != 2 {
 		t.Errorf("got %d cards, want one per match (2): %s", got, body)
 	}
-	if got := strings.Count(body, `class="scoreline"`); got != 2 {
+	if got := strings.Count(grid, `class="scoreline"`); got != 2 {
 		t.Errorf("got %d scorelines, want 2", got)
 	}
 	if !strings.Contains(body, `<span class="stage">Group stage</span>`) {
