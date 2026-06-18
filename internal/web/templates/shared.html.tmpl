@@ -68,7 +68,10 @@
        via the default stretch); avoids stretching every card to the
        tallest in the whole grid, which left unplayed cards half-empty. */
     .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; margin: 0 0 2.5rem; }
-    .card { display: flex; flex-direction: column; justify-content: center; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1rem 1.1rem; box-shadow: none; margin: 0; }
+    /* Top-align content so cards stretched to a taller row-mate (e.g. a
+       team name that wraps) keep their heads level; slack falls before the
+       venue, which is pinned to the bottom (.venue-row margin-top:auto). */
+    .card { display: flex; flex-direction: column; justify-content: flex-start; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1rem 1.1rem; box-shadow: none; margin: 0; }
     /* In-progress: a LIVE badge (text, not colour alone) + a brighter
        border. No box-shadow glow. */
     .card.live { border-color: rgba(var(--green-rgb),.55); }
@@ -94,7 +97,7 @@
     .score .sep { margin: 0 .3rem; color: var(--muted); font-weight: 400; }
     .vs { font-size: 1.1rem; color: var(--muted); padding-top: .9rem; }
     .pens { display: block; font-size: .68rem; font-weight: 400; color: var(--muted); margin-top: .2rem; }
-    .venue-row { display: flex; justify-content: center; align-items: center; gap: .5rem; margin-top: .9rem; }
+    .venue-row { display: flex; justify-content: center; align-items: center; gap: .5rem; margin-top: auto; padding-top: .9rem; }
     .venue { color: var(--muted); font-size: .72rem; }
     .status { text-align: center; color: var(--muted); font-size: .72rem; margin-top: .9rem; }
     .empty { color: var(--muted); padding: 2rem 0; }
