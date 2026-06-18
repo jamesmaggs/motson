@@ -36,10 +36,9 @@ var templates = template.Must(template.ParseFS(templateFS, "templates/*.tmpl"))
 
 type pageData struct {
 	Featured        *matchView // the spotlighted live/next match, nil when none
-	Matches         []matchView
+	Days            []dayGroup
 	LastSyncedUTC   string
 	LastSyncedLabel string
-	HasVenues       bool
 	AssetVersion    string
 	Nav             navData
 }
@@ -139,7 +138,7 @@ func page(store fixtures.Store, host string, clock func() time.Time) http.Handle
 			v := viewOf(fm)
 			data.Featured = &v
 		}
-		data.Matches, data.HasVenues = buildViews(matches)
+		data.Days = groupByDay(matches)
 
 		render(w, "index.html.tmpl", data)
 	}
@@ -177,16 +176,38 @@ func lastSynced(state fixtures.SyncState) string {
 	return state.LastSyncedAt.UTC().Format(time.RFC3339)
 }
 
-func buildViews(matches []fixtures.Match) ([]matchView, bool) {
-	views := make([]matchView, len(matches))
-	hasVenues := false
-	for i, m := range matches {
-		views[i] = viewOf(m)
-		if m.Venue != "" {
-			hasVenues = true
+// dayGroup is one calendar day's fixtures, fronted by a date heading.
+// Matches are grouped by their UTC date (the pages are server-rendered);
+// the heading localises to the viewer's date via the same client script
+// that localises kickoff times (ADR 0010), with a UTC date as the no-JS
+// fallback.
+type dayGroup struct {
+	DateUTC   string // representative instant (noon UTC) for the <time> heading
+	DateLabel string // human UTC fallback shown until the client localises it
+	Matches   []matchView
+}
+
+// groupByDay splits kickoff-ordered matches into consecutive day groups,
+// preserving order within and across days.
+func groupByDay(matches []fixtures.Match) []dayGroup {
+	var days []dayGroup
+	lastKey := ""
+	for _, m := range matches {
+		y, mo, d := m.KickoffAt.UTC().Date()
+		key := fmt.Sprintf("%04d-%02d-%02d", y, mo, d)
+		if key != lastKey {
+			// Noon UTC is a stable representative: it localises to the same
+			// calendar date across every realistic timezone offset.
+			noon := time.Date(y, mo, d, 12, 0, 0, 0, time.UTC)
+			days = append(days, dayGroup{
+				DateUTC:   noon.Format(time.RFC3339),
+				DateLabel: noon.Format("Monday 2 January"),
+			})
+			lastKey = key
 		}
+		days[len(days)-1].Matches = append(days[len(days)-1].Matches, viewOf(m))
 	}
-	return views, hasVenues
+	return days
 }
 
 func render(w http.ResponseWriter, name string, data any) {

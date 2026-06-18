@@ -15,9 +15,7 @@
           </div>
         </aside>
         <section class="match-col" aria-label="{{.TeamName}} matches">
-          <div class="cards">
-            {{range .Matches}}{{template "matchCard" .}}{{end}}
-          </div>
+          {{template "matchDays" .Days}}
         </section>
       </div>
 {{template "footer" .}}

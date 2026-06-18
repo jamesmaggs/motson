@@ -64,11 +64,10 @@ type teamDetailData struct {
 	GroupName       string
 	GroupURL        string
 	Standings       []standingRow
-	Matches         []matchView
+	Days            []dayGroup
 	LastSyncedUTC   string
 	LastSyncedLabel string
 	AssetVersion    string
-	HasVenues       bool
 	Nav             navData
 }
 
@@ -128,7 +127,7 @@ func teamDetail(store fixtures.Store, host string) http.HandlerFunc {
 				data.GroupURL = "/groups/" + letter
 			}
 		}
-		data.Matches, data.HasVenues = buildViews(own)
+		data.Days = groupByDay(own)
 		// Highlight this team — and its group — in the nav.
 		data.Nav.ActiveTeamURL = teamURL(team.Name)
 		data.Nav.ActiveGroupURL = data.GroupURL

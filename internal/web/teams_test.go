@@ -4,9 +4,26 @@ import (
 	"net/http"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/jamesmaggs/motson/internal/fixtures"
 )
+
+// DatedFixtures: a team page groups its fixtures across stages by matchday.
+func TestTeamDetailGroupsFixturesByDate(t *testing.T) {
+	group := match("wc-tg")
+	group.KickoffAt = time.Date(2026, 6, 13, 18, 0, 0, 0, time.UTC)
+
+	knockout := withID(match("wc-tko"), "wc-tko")
+	knockout.Stage, knockout.GroupName = fixtures.StageSemiFinal, ""
+	knockout.HomeTeam, knockout.AwayTeam = "Canada", "France"
+	knockout.KickoffAt = time.Date(2026, 7, 14, 19, 0, 0, 0, time.UTC)
+
+	body := get(t, seeded(t, group, knockout), now, "/teams/canada").Body.String()
+	if got := strings.Count(body, `class="day-heading"`); got != 2 {
+		t.Errorf("team page should group fixtures by date (2 headings), got %d: %s", got, body)
+	}
+}
 
 // A spread where South Korea plays in Group F and Canada reaches a
 // semi-final, plus an undetermined fixture.

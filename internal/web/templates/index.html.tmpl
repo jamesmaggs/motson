@@ -12,10 +12,8 @@
       {{template "matchCard" .}}
     </section>
     {{end}}
-    {{if .Matches}}
-    <div class="cards">
-      {{range .Matches}}{{template "matchCard" .}}{{end}}
-    </div>
+    {{if .Days}}
+    {{template "matchDays" .Days}}
     {{else}}
     <p class="empty">No fixtures yet — they'll appear here as soon as the match schedule is published.</p>
     {{end}}

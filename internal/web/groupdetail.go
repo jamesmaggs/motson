@@ -27,11 +27,10 @@ func standingRows(groupMatches []fixtures.Match) []standingRow {
 type groupDetailData struct {
 	GroupName       string
 	Standings       []standingRow
-	Matches         []matchView
+	Days            []dayGroup
 	LastSyncedUTC   string
 	LastSyncedLabel string
 	AssetVersion    string
-	HasVenues       bool
 	Nav             navData
 }
 
@@ -68,14 +67,16 @@ func groupDetail(store fixtures.Store, host string) http.HandlerFunc {
 			Nav:             buildNav(matches, host),
 		}
 		data.Nav.ActiveGroupURL = "/groups/" + r.PathValue("group") // highlight this group in the nav
-		data.Matches, data.HasVenues = buildViews(group)
+		data.Days = groupByDay(group)
 		// On a group's own page the group is implied, so drop the
 		// self-referential group pill from each card (as knockout cards
 		// carry none). The accessible label, computed in viewOf, keeps
 		// the group context.
-		for i := range data.Matches {
-			data.Matches[i].GroupName = ""
-			data.Matches[i].GroupURL = ""
+		for i := range data.Days {
+			for j := range data.Days[i].Matches {
+				data.Days[i].Matches[j].GroupName = ""
+				data.Days[i].Matches[j].GroupURL = ""
+			}
 		}
 
 		render(w, "groupdetail.html.tmpl", data)

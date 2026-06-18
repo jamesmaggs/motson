@@ -291,8 +291,19 @@ surface FixturesPage {
         -- its usual kickoff position. When none is in play or upcoming,
         -- no spotlight card is shown.
 
+    @guarantee DatedFixtures
+        -- The fixtures list is segmented into consecutive day groups,
+        -- each preceded by a date heading (the matchday). Within and
+        -- across groups the overall kickoff order is preserved; the
+        -- list is just visually divided by day. Grouping is by the
+        -- match's UTC date, with that UTC date shown as the heading's
+        -- no-JS fallback; client JS localises each heading to the
+        -- viewer's date, the same mechanism that localises kickoff
+        -- times.
+
     @guidance
-        -- Matches are presented as cards in kickoff order: stage and
+        -- Matches are presented as cards in kickoff order, grouped by
+        -- date with a date heading before each day's matches: stage and
         -- kickoff time
         -- top-left, the group (a link to its GroupDetailPage)
         -- top-right, and the score — or "vs" before kick-off — flanked
@@ -324,8 +335,9 @@ surface GroupDetailPage {
         -- One instance of this surface exists per group (A through
         -- L). An instance exposes only its own group's standings and
         -- matches: the standings table first in reading order, then
-        -- the group's results and fixtures in kickoff order. Requests
-        -- for a group that does not exist are refused as not found.
+        -- the group's results and fixtures in kickoff order, grouped by
+        -- date as on FixturesPage (see DatedFixtures). Requests for a
+        -- group that does not exist are refused as not found.
 
     @guarantee StandingsOrder
         -- Standings rank by points, then goal difference, then goals
@@ -352,7 +364,9 @@ surface GroupDetailPage {
         -- "Group X" stage label links to its group's page) and
         -- addressed by group letter (e.g. /groups/A). Presented with
         -- the same chrome as FixturesPage: the navigation menu, the
-        -- group's matches as cards, and the standings in a matching
+        -- group's matches as cards grouped by date with a date heading
+        -- before each day's matches (see DatedFixtures), and the
+        -- standings in a matching
         -- card. On wide screens these form three columns (menu,
         -- matches, table); when stacked, the table leads.
 
@@ -382,8 +396,9 @@ surface TeamDetailPage {
         -- replaced with hyphens, e.g. "South Korea" -> south-korea).
         -- The instance shows the team's name with its flag, the
         -- team's group standings table, and every fixture the team
-        -- appears in across all stages, in kickoff order. Unknown
-        -- slugs are refused as not found.
+        -- appears in across all stages, in kickoff order, grouped by
+        -- date as on FixturesPage (see DatedFixtures). Unknown slugs
+        -- are refused as not found.
 
     @guarantee TeamNavigation
         -- The page links to the team's GroupDetailPage and to every
@@ -396,7 +411,9 @@ surface TeamDetailPage {
         -- Presented with the same chrome as FixturesPage and
         -- GroupDetailPage: the navigation menu, the team's matches as
         -- cards (across all stages, group-stage cards linking to the
-        -- GroupDetailPage), and the team's group standings in a card.
+        -- GroupDetailPage) grouped by date with a date heading before
+        -- each day's matches (see DatedFixtures), and the team's group
+        -- standings in a card.
         -- The standings card is titled with the team's name and flag,
         -- the group name beneath it, and the team's own row is
         -- highlighted. On wide screens these form three columns (menu,

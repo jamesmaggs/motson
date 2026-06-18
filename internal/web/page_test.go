@@ -116,6 +116,40 @@ func TestIndexHasNoSpotlightWhenNothingLiveOrUpcoming(t *testing.T) {
 	}
 }
 
+// DatedFixtures: the index groups its fixtures by matchday, with a date
+// heading before each day's cards, in chronological order.
+func TestIndexGroupsFixturesByDate(t *testing.T) {
+	day1 := match("wc-d1")
+	day1.Status = fixtures.StatusFinished
+	day1.HomeScore, day1.AwayScore = intp(1), intp(0)
+	day1.KickoffAt = time.Date(2026, 6, 13, 18, 0, 0, 0, time.UTC)
+
+	day2 := withID(match("wc-d2"), "wc-d2")
+	day2.HomeTeam, day2.AwayTeam = "Spain", "France"
+	day2.KickoffAt = time.Date(2026, 6, 14, 16, 0, 0, 0, time.UTC)
+
+	body := get(t, seeded(t, day1, day2), now, "/").Body.String()
+	// Drop the spotlight (it duplicates a match) and assess only the list.
+	grid := withoutFeatured(body)
+
+	if got := strings.Count(grid, `class="day-heading"`); got != 2 {
+		t.Fatalf("want one date heading per matchday (2), got %d: %s", got, grid)
+	}
+	// Headings use the full month name; kickoff labels use "Jun", so these
+	// match only the headings. They appear in chronological order.
+	d13, d14 := strings.Index(grid, "13 June"), strings.Index(grid, "14 June")
+	if d13 < 0 || d14 < 0 {
+		t.Fatalf("date headings missing: %s", grid)
+	}
+	if d13 > d14 {
+		t.Errorf("date headings out of chronological order: %s", grid)
+	}
+	// The 14 June match sits under the 14 June heading, after it.
+	if spain := strings.Index(grid, `<span class="name">Spain</span>`); spain < d14 {
+		t.Errorf("14 June match should fall under its heading: %s", grid)
+	}
+}
+
 // Scores appear only once a match is finished; an in-play match shows
 // "vs" and an "In play" label, not a score.
 func TestPageShowsScoreOnlyWhenFinished(t *testing.T) {

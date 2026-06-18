@@ -4,9 +4,25 @@ import (
 	"net/http"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/jamesmaggs/motson/internal/fixtures"
 )
+
+// DatedFixtures: a group page groups its fixtures by matchday too.
+func TestGroupDetailGroupsFixturesByDate(t *testing.T) {
+	d1 := match("wc-g1")
+	d1.KickoffAt = time.Date(2026, 6, 13, 18, 0, 0, 0, time.UTC)
+
+	d2 := withID(match("wc-g2"), "wc-g2")
+	d2.HomeTeam, d2.AwayTeam = "Honduras", "Jamaica"
+	d2.KickoffAt = time.Date(2026, 6, 15, 16, 0, 0, 0, time.UTC)
+
+	body := get(t, seeded(t, d1, d2), now, "/groups/A").Body.String()
+	if got := strings.Count(body, `class="day-heading"`); got != 2 {
+		t.Errorf("group page should group fixtures by date (2 headings), got %d: %s", got, body)
+	}
+}
 
 func groupA(t *testing.T) fixtures.Store {
 	t.Helper()

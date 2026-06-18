@@ -93,6 +93,11 @@
     .venue { text-align: center; color: var(--muted); font-size: .72rem; margin-top: .9rem; }
     .status { text-align: center; color: var(--muted); font-size: .72rem; margin-top: .9rem; }
     .empty { color: var(--muted); padding: 2rem 0; }
+    /* Fixtures grouped by matchday: a date heading before each day's cards. */
+    .day { margin: 0 0 2.5rem; }
+    .day:last-child { margin-bottom: 0; }
+    .day .cards { margin: 0; }
+    .day-title { margin: 0 0 .9rem; font-size: 1.05rem; font-weight: 600; color: var(--ink); padding-bottom: .55rem; border-bottom: 1px solid var(--border); }
     /* Featured "Next Match" spotlight at the top of the index: a card
        wrapper (like the standings card) holding a title and one match;
        the inner match card sheds its own chrome to avoid a card-in-card. */
@@ -272,6 +277,17 @@
       </article>
 {{end}}
 
+{{define "matchDays"}}
+      {{range .}}
+      <section class="day">
+        <h2 class="day-title"><time class="day-heading" datetime="{{.DateUTC}}">{{.DateLabel}}</time></h2>
+        <div class="cards">
+          {{range .Matches}}{{template "matchCard" .}}{{end}}
+        </div>
+      </section>
+      {{end}}
+{{end}}
+
 {{define "standingsTable"}}
     <table>
       <thead>
@@ -306,12 +322,13 @@
   <script>
     for (const el of document.querySelectorAll("time[datetime]")) {
       const d = new Date(el.getAttribute("datetime"));
-      if (!isNaN(d)) {
-        el.textContent = d.toLocaleString(undefined, {
-          weekday: "short", day: "numeric", month: "short",
-          hour: "2-digit", minute: "2-digit"
-        });
-      }
+      if (isNaN(d)) continue;
+      // Date-group headings localise to the viewer's date only; everything
+      // else (kickoff times, last-synced) shows the local date and time.
+      const opts = el.classList.contains("day-heading")
+        ? { weekday: "long", day: "numeric", month: "long" }
+        : { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" };
+      el.textContent = d.toLocaleString(undefined, opts);
     }
     const navToggle = document.querySelector(".nav-toggle");
     if (navToggle) {
